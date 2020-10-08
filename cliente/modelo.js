@@ -1,31 +1,31 @@
 function Juego() {
     this.partidas = {}; // Diccionario (array asociativo)
-    this.crearPartida = function(num, owner) { // número de Jugadores y propietario
+    this.crearPartida = function(num, owner) { // número de Jugadores máximo y propietario
         // generar un código de 6 letras aleatorio
         let codigo = this.obtenerCodigo();
         
         // comprobar que el número no está en uso
         if(!this.partidas[codigo]) {
-            // crear el objeto partida:num owner
+            // crear el objeto partida
             this.partidas[codigo] = new Partida(num, owner);
         }
 
     }
     
     this.unirAPartida = function(codigo, nick) {
-        // ToDo
-        if (this.partidas[codigo] /*&& Object.keys(this.partidas[codigo].usuarios).length < this.partidas.maximo*/) {
+        if (this.partidas[codigo] && this.puedeUnirse(codigo)) {
             this.partidas[codigo].agregarUsuario(nick);
         }
     }
 
-    this.MaximoPartida = function(codigo) {
-        Object.keys(this.partidas[codigo].usuarios).length;
+    // Comprueba si se puede unir, compara el num de jugadores actual con el máximo de la partida
+    this.puedeUnirse = function(codigo) {
+        return Object.keys(this.partidas[codigo].usuarios).length < this.partidas[codigo].maximo;
     }
 
     this.obtenerCodigo = function() {
         let cadena = "ABCDEFGHIJKMNLOPQRSTUVWXYZ";
-        let letras = cadena.split('');
+        let letras = cadena.split('');  // convierte cadena en un vector
         let maxCadena = cadena.length;
         let codigo = [];
         for (i=0; i<6; i++) {
@@ -39,16 +39,14 @@ function Juego() {
 function Partida(num, owner) {
     this.maximo = num; // número max de usuarios
     this.nickOwner = owner;
-    this.usuarios = {}; // El index 0 será el owner
-    // this.usuarios = {}; //versión array asociativo
+    this.fase = new Inicial();
+    this.usuarios = {}; // Diccionario para el control de nombres
 
     this.agregarUsuario = function(nick){
-        this.fase.puedeAgregarUsuario()
+        this.fase.agregarUsuario(nick, this)
     }
 
-
-    this.agregarUsuario = function(nick) {
-        if(Object.keys(this.usuarios).length < this.maximo /* Probar a hacerlo en Juego */) {
+    this.puedeAgregarUsuario = function(nick) {
         // comprobar nick único
         let cont = 1;
         let nuevo = nick;
@@ -59,31 +57,27 @@ function Partida(num, owner) {
         }
 
         this.usuarios[nuevo] = new Usuario(nuevo);
-
-        /* if(this.usuarios[nick]) {
-            this.usuarios[nick] = new Usuario(nick + repeticion.toString());
-            repeticion ++;
-        }
-        else {
-            this.usuarios[nick] = new Usuario(nick);
-        } */
-        // comprobar si el usuario num (máximo)
-        }
+        
     }
 
+    // Al crear la partida, el owner también se agrega a la lista de usuarios
     this.agregarUsuario(owner);
+
 }
 
+// Estados del juego (State)
 function Inicial(){
     this.agregarUsuario = function(nick, partida) {
         partida.puedeAgregarUsuario(nick);
     }
 }
+
 function Jugando(){
     this.agregarUsuario = function(nick, partida) {
         //partida.puedeAgregarUsuario(nick);
     }
 }
+
 function Final(){
     this.agregarUsuario = function(nick, partida) {
         //partida.puedeAgregarUsuario(nick);
@@ -91,7 +85,7 @@ function Final(){
 }
 
 function Usuario(nick) {
-    this.nick;
+    this.nick = nick;
 }
 
 function randomInt(low, high) {
