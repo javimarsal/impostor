@@ -7,9 +7,9 @@ function Juego() {
         // comprobar que el número no está en uso
         if(!this.partidas[codigo]) {
             // crear el objeto partida
-            this.partidas[codigo] = new Partida(num, owner);
+            this.partidas[codigo] = new Partida(num, owner.nick);
+            owner.partida = this.partidas[codigo];
         }
-
     }
     
     this.unirAPartida = function(codigo, nick) {
@@ -19,6 +19,8 @@ function Juego() {
     }
 
     // Comprueba si se puede unir, compara el num de jugadores actual con el máximo de la partida
+    // Quitar en un futuro
+    // Ya se controla con la fase "Completado"
     this.puedeUnirse = function(codigo) {
         return Object.keys(this.partidas[codigo].usuarios).length < this.partidas[codigo].maximo;
     }
@@ -42,7 +44,7 @@ function Partida(num, owner) {
     this.fase = new Inicial();
     this.usuarios = {}; // Diccionario para el control de nombres
 
-    this.agregarUsuario = function(nick){
+    this.agregarUsuario = function(nick) {
         this.fase.agregarUsuario(nick, this)
     }
 
@@ -58,6 +60,13 @@ function Partida(num, owner) {
 
         this.usuarios[nuevo] = new Usuario(nuevo);
         
+        if (Object.keys(this.usuarios).length >= this.maximo) {
+            this.fase = new Completado();
+        }
+    }
+
+    this.iniciarPartida = function() {
+        this.fase.iniciarPartida(this);
     }
 
     // Al crear la partida, el owner también se agrega a la lista de usuarios
@@ -70,22 +79,50 @@ function Inicial(){
     this.agregarUsuario = function(nick, partida) {
         partida.puedeAgregarUsuario(nick);
     }
+    
+    this.iniciarPartida = function(partida) {
+        console.log("Faltan jugadores.");
+    }
+}
+
+function Completado(){
+    this.agregarUsuario = function(nick, partida) {
+        console.log("Se ha alcanzado el número máximo de jugadores.");
+    }
+    
+    this.iniciarPartida = function(partida) {
+        partida.fase = new Jugando();
+    }
 }
 
 function Jugando(){
     this.agregarUsuario = function(nick, partida) {
-        //partida.puedeAgregarUsuario(nick);
+        console.log("La partida ya ha comenzado.");
     }
+
+    this.iniciarPartida = function(partida) {}
 }
 
 function Final(){
     this.agregarUsuario = function(nick, partida) {
-        //partida.puedeAgregarUsuario(nick);
+        console.log("La partida ya ha terminado");
     }
+
+    this.iniciarPartida = function(partida) {}
 }
 
-function Usuario(nick) {
+function Usuario(nick, juego) {
     this.nick = nick;
+    this.juego = juego;
+    this.partida;
+    
+    this.crearPartida = function(num) {
+        this.juego.crearPartida(num, this);
+    }
+    
+    this.iniciarPartida = function() {
+        this.partida.iniciarPartida();
+    }
 }
 
 function randomInt(low, high) {
