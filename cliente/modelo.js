@@ -66,6 +66,7 @@ function Partida(num, owner) {
     this.nickOwner = owner;
     this.fase = new Inicial();
     this.usuarios = {}; // Diccionario para el control de nombres
+    this.numImpostores = 1;
 
     this.agregarUsuario = function(nick) {
         this.fase.agregarUsuario(nick, this);
@@ -81,7 +82,7 @@ function Partida(num, owner) {
             cont = cont + 1;
         }
 
-        this.usuarios[nuevo] = new Usuario(nuevo, this.juego);
+        this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
     }
 
@@ -102,12 +103,18 @@ function Partida(num, owner) {
     }
 
     this.asignarImpostor = function() {
-        // Devuelve las keys de usuarios en un array asociativo
+        // Devuelve las keys de usuarios en un array normal
         // [0: "Pepe", 1: "Luis", 2: "Jose", ...]
         let usuarios = Object.keys(this.usuarios);
-        let maxCadena = usuarios.length;
-        let nickImpostor = usuarios[randomInt(0, maxCadena)];
-        this.usuarios[nickImpostor].impostor = true;
+        
+        for(i=0; i<this.numImpostores; i++) {
+            let maxCadena = usuarios.length;
+            let num = randomInt(0, maxCadena);
+            let nickImpostor = usuarios[num];
+            this.usuarios[nickImpostor].impostor = true;
+            // Eliminamos el que ya es impostor para que no lo vuelva a elegir
+            usuarios.splice(num, 1);    // elimina "1" el objeto en la posición num de usuarios
+        }
     }
 
     this.asignarEncargos = function(encargos) {
@@ -184,9 +191,12 @@ function Completado(){
     }
     
     this.iniciarPartida = function(partida) {
-        // llama puedeIniciarPartida();
-        partida.puedeIniciarPartida();
-        // partida.fase = new Jugando();
+        if((partida.numJugadores() - partida.numImpostores) > partida.numImpostores) {
+            partida.puedeIniciarPartida();
+        }
+        else {
+            console.log("No se puede iniciar partida. Los impostores ganan");
+        }
     }
 
     this.abandonarPartida = function(nick, partida, juego) {
