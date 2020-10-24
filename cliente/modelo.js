@@ -12,7 +12,7 @@ function Juego() {
             // comprobar que el número no está en uso
             if(!this.partidas[codigo]) {
                 // crear el objeto partida
-                this.partidas[codigo] = new Partida(num, owner.nick);
+                this.partidas[codigo] = new Partida(num, owner.nick, codigo);
                 owner.partida = this.partidas[codigo];
             }
 
@@ -60,13 +60,14 @@ function Juego() {
     }
 }
 
-function Partida(num, owner) {
+function Partida(num, owner, codigo) {
     this.maximo = num; // número max de usuarios
     this.minimo = 4;
     this.nickOwner = owner;
     this.fase = new Inicial();
     this.usuarios = {}; // Diccionario para el control de nombres
     this.numImpostores = 1;
+    this.codigo = codigo;
 
     this.agregarUsuario = function(nick) {
         this.fase.agregarUsuario(nick, this);
@@ -92,6 +93,7 @@ function Partida(num, owner) {
 
     this.puedeIniciarPartida = function() {
         // cambiar fase a Jugando
+        this.restablecerUsuarios();
         this.fase = new Jugando();
         
         // Asignar encargos: secuencialmente a todos los usuarios
@@ -100,6 +102,15 @@ function Partida(num, owner) {
 
         // Asignar impostor: dado el array usuario (Object.keys)
         this.asignarImpostor();
+    }
+
+    // Restablecer todos los valores del usuario, menos lo relacionado con votar
+    this.restablecerUsuarios = function() {
+        for(key in this.usuarios) {
+            this.usuarios[key].impostor = false;
+            this.usuarios[key].encargo = "ninguno";
+            this.usuarios[key].estado = new Vivo();
+        }
     }
 
     this.asignarImpostor = function() {
@@ -113,15 +124,15 @@ function Partida(num, owner) {
             let nickImpostor = usuarios[num];
             this.usuarios[nickImpostor].impostor = true;
             // Eliminamos el que ya es impostor para que no lo vuelva a elegir
-            usuarios.splice(num, 1);    // elimina "1" el objeto en la posición num de usuarios
+            usuarios.splice(num, 1);    // elimina "1" el objeto en la posición "num" de usuarios
         }
     }
 
     this.asignarEncargos = function(encargos) {
         let cont = 0;
         
-        for(i in this.usuarios) {
-            this.usuarios[i].encargo = encargos[cont];
+        for(key in this.usuarios) {
+            this.usuarios[key].encargo = encargos[cont];
             cont++;
 
             if(cont == encargos.length) {
@@ -134,8 +145,205 @@ function Partida(num, owner) {
         this.fase.abandonarPartida(nick, this, juego);
     }
 
-    this.puedeAbandonarPartida = function(nick) {
+    this.puedeAbandonarPartida = function(nick, juego) {
         delete this.usuarios[nick];
+
+        if(!this.comprobarMinimo()) {
+            this.fase = new Inicial();
+        }
+
+        // comprobar si no quedan usuarios, eliminar partida
+        if(this.numJugadores() <= 0) {
+            juego.eliminarPartida(this);
+        }
+    }
+
+    this.atacar = function(usuario) {
+        this.fase.atacar(this, usuario);
+    }
+
+    this.puedeAtacar = function() {
+        // Ataca a alguien al azar usando esAtacado() del usuario atacado
+        let victima = this.elegirTripulanteVivo();
+        victima.esAtacado();
+        // Comprobar si termina la partida
+        if(this.comprobarFinal()) {
+            console.log("La partida ha terminado.");
+        }
+    }
+
+    // VOTACIONES //
+    this.iniciarVotacion = function() {
+        this.fase.iniciarVotacion(this);
+    }
+
+    this.puedeIniciarVotacion = function() {
+        this.fase = new Votando();
+    }
+    
+    this.votar = function(sospechoso, votante) {
+        this.fase.votar(sospechoso, votante, this);
+    }
+
+    this.puedeVotar = function(sospechoso, votante) {
+        // console.log("Has votado a", sospechoso.nick);
+        if(this.usuarios[sospechoso] && this.usuarios[sospechoso].estado instanceof Vivo && !votante.haVotado) {
+            this.usuarios[sospechoso].votos++;
+            votante.haVotado = true;
+            console.log(votante.nick, "ha votado.");
+        }
+        else if((sospechoso == "skip" || sospechoso == undefined) && !votante.haVotado) {
+            votante.skip = true;
+            votante.haVotado = true;
+            console.log(votante.nick, "ha votado.");
+        }
+        else if(votante.haVotado) {
+            console.log("Ya has votado, solo puedes votar 1 vez.");
+        }
+    }
+
+    // método que devuelva el número de impostores vivos
+    this.numImpostoresVivos = function() {
+        let num = 0;
+
+        // i recibe una string
+        for(key in this.usuarios) {
+            if(this.usuarios[key].impostor && (this.usuarios[key].estado instanceof Vivo)) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    // método que devuelva el número de tripulantes inocentes vivos
+    this.numTripulantesVivos = function() {
+        let num = 0;
+
+        // i recibe una string
+        for(key in this.usuarios) {
+            if(!this.usuarios[key].impostor && (this.usuarios[key].estado instanceof Vivo)) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    this.gananImpostores = function() {
+        return this.numTripulantesVivos() <= this.numImpostoresVivos();
+    }
+
+    this.gananTripulantes = function() {
+        return this.numImpostoresVivos() == 0; /*|| todas las tareas completadas*/
+    }
+
+    this.comprobarFinal = function() {
+        if(this.gananImpostores()) {
+            this.fase = new Final();
+            console.log("Los impostores han ganado.");
+            return true;
+        }
+        else if(this.gananTripulantes()) {
+            this.fase = new Final();
+            console.log("Los tripulantes han ganado.");
+            return true;
+        }
+    }
+
+    this.masVotado = function() {
+        let max = 0;
+        let usr = undefined;
+        let votos;
+        
+        for(key in this.usuarios) {
+            votos = this.usuarios[key].votos;
+            if(votos > max) {
+                max = votos;
+                usr = this.usuarios[key];
+            }
+        }
+
+        // Comprobamos si hay empate de votos con el más votado
+        // mirar si hay algún voto igual a max, sin contar el de usr
+        for(key in this.usuarios) {
+            votos = this.usuarios[key].votos;
+            if(votos == max && !(this.usuarios[key] === usr)) {
+                usr = undefined;
+                break;
+            }
+        }
+
+        return usr; // usr puede ser undefined (todos votan skip)
+    }
+
+    this.numeroSkips = function() {
+        let numSkips = 0;
+        
+        for(key in this.usuarios) {
+            if(this.usuarios[key].skip) {
+                numSkips++;
+            }
+        }
+        return numSkips;
+    }
+
+    this.reiniciarVotos = function() {
+        for(key in this.usuarios) {
+            this.usuarios[key].votos = 0;
+            this.usuarios[key].skip = false;
+            this.usuarios[key].haVotado = false;
+        }
+    }
+
+    this.comprobarVotacion = function() {
+        let elegido = this.masVotado();
+
+        // Poner a los que no han votado, el skip y haVotado a true
+        for(key in this.usuarios) {
+            if(this.usuarios[key].estado instanceof Vivo && !this.usuarios[key].haVotado) {
+                this.usuarios[key].skip = true;
+                this.usuarios[key].haVotado = true;
+            }
+        }
+
+        if(elegido && elegido.votos > this.numeroSkips()) {
+            elegido.esAtacado();
+            console.log(elegido.nick, "fue eyectado.");
+        }
+        else {
+            console.log("Nadie fue eyectado.");
+        }
+
+    }
+
+    this.finalizarVotacion = function() {
+        this.fase.finalizarVotacion(this);
+    }
+
+    this.puedeFinalizarVotacion = function() {
+        this.comprobarVotacion();
+        this.reiniciarVotos();
+        if(!this.comprobarFinal()) {
+            this.fase = new Jugando();
+        }
+    }
+
+    // TERMINA VOTACIONES //
+
+
+    // Elegir un usuario vivo para atacarlo
+    this.elegirTripulanteVivo = function() {
+        let usuarios = [];
+
+        // Se guarda en usuarios los usuarios vivos que no son impostores
+        for(key in this.usuarios) {
+            if((this.usuarios[key].estado instanceof Vivo) && !this.usuarios[key].impostor) {
+                usuarios.push(key);
+            }
+        }
+        
+        let num = randomInt(0, usuarios.length);
+        let nick = usuarios[num];
+        return this.usuarios[nick];
     }
 
     this.numJugadores = function() {
@@ -170,12 +378,23 @@ function Inicial(){
     }
 
     this.abandonarPartida = function(nick, partida, juego) {
-        partida.puedeAbandonarPartida(nick);
+        partida.puedeAbandonarPartida(nick, juego);
+    }
 
-        // comprobar si no quedan usuarios
-        if(partida.numJugadores() <= 0) {
-            juego.eliminarPartida(partida);
-        }
+    this.atacar = function(partida, usuario) {
+        console.log("La partida no ha empezado.");
+    }
+
+    this.iniciarVotacion = function(partida) {
+        console.log("Aun no ha empezado la partida.");
+    }
+
+    this.votar = function(sospechoso, votante, partida) {
+        console.log("No puedes votar sin empezar la partida.");
+    }
+
+    this.finalizarVotacion = function(partida) {
+        console.log("Aun no ha empezado la partida.");
     }
 }
 
@@ -186,7 +405,7 @@ function Completado(){
             partida.puedeAgregarUsuario(nick);
         }
         else {
-            console.log("Se ha alcanzado el número máximo de jugadores en la partida");
+            console.log("Se ha alcanzado el número máximo de jugadores en la partida.");
         }
     }
     
@@ -195,16 +414,28 @@ function Completado(){
             partida.puedeIniciarPartida();
         }
         else {
-            console.log("No se puede iniciar partida. Los impostores ganan");
+            console.log("No se puede iniciar partida. Los impostores ganan.");
         }
     }
 
     this.abandonarPartida = function(nick, partida, juego) {
         partida.puedeAbandonarPartida(nick);
-        
-        if(!partida.comprobarMinimo()) {
-            partida.fase = new Inicial();
-        }
+    }
+
+    this.atacar = function(partida, usuario) {
+        console.log("La partida no ha empezado.");
+    }
+
+    this.iniciarVotacion = function(partida) {
+        console.log("Aun no ha empezado la partida.");
+    }
+
+    this.votar = function(sospechoso, votante, partida) {
+        console.log("No puedes votar sin empezar la partida.");
+    }
+
+    this.finalizarVotacion = function(partida) {
+        console.log("Aun no ha empezado la partida.");
     }
 }
 
@@ -219,18 +450,69 @@ function Jugando(){
         partida.puedeAbandonarPartida(nick);
         // comprobar si termina la partida (más impostores o más tripulantes)
     }
+
+    this.atacar = function(partida, usuario) {
+        partida.puedeAtacar(usuario);
+    }
+
+    this.iniciarVotacion = function(partida) {
+        partida.puedeIniciarVotacion();
+        console.log("Empieza la votación!");
+    }
+
+    this.votar = function(sospechoso, votante, partida) {
+        console.log("No se ha iniciado ninguna votación.");
+    }
+
+    this.finalizarVotacion = function(partida) {
+        console.log("No se ha iniciado ninguna votación.");
+    }
+}
+
+function Votando() {
+    this.agregarUsuario = function(nick, partida) {}
+
+    this.iniciarPartida = function(partida) {}
+
+    this.abandonarPartida = function(nick, partida, juego) {}
+
+    this.atacar = function(partida, usuario) {}
+
+    this.iniciarVotacion = function(partida) {
+        console.log("No puedes iniciar una votación. Ya está en marcha.");
+    }
+
+    this.votar = function(sospechoso, votante, partida) {
+        partida.puedeVotar(sospechoso, votante);
+    }
+
+    this.finalizarVotacion = function(partida) {
+        partida.puedeFinalizarVotacion();
+    }
 }
 
 // Pantalla final? 2 opciones: salir de partida o volver a jugar
 function Final(){
     this.agregarUsuario = function(nick, partida) {
-        console.log("La partida ya ha terminado");
+        console.log("La partida ya ha terminado.");
     }
 
     this.iniciarPartida = function(partida) {}
 
     this.abandonarPartida = function(nick, partida, juego) {
         partida.puedeAbandonarPartida(nick);
+    }
+
+    this.atacar = function(partida, usuario) {
+        console.log("La partida ya ha terminado.");
+    }
+
+    this.iniciarVotacion = function(partida) {
+        console.log("La partida ya ha terminado.");
+    }
+
+    this.votar = function(sospechoso, votante, partida) {
+        console.log("La partida ya ha terminado.");
     }
 }
 
@@ -240,6 +522,10 @@ function Usuario(nick, juego) {
     this.partida;
     this.impostor = false;
     this.encargo = "ninguno";
+    this.estado = new Vivo();
+    this.votos = 0;
+    this.skip = false;
+    this.haVotado = false;
     
     this.crearPartida = function(num) {
         return this.juego.crearPartida(num, this);
@@ -252,6 +538,64 @@ function Usuario(nick, juego) {
     this.abandonarPartida = function() {
         this.partida.abandonarPartida(this.nick);
     }
+
+    this.atacar = function() {
+        if(this.impostor == true) {
+            this.partida.atacar(this);
+        }
+        else {
+            console.log("No eres impostor, no puedes atacar.");
+        }
+    }
+
+    this.esAtacado = function() {
+        this.estado.esAtacado(this);
+    }
+
+    this.puedeSerAtacado = function() {
+        this.estado = new Muerto();
+    }
+
+    this.iniciarVotacion = function() {
+        this.estado.iniciarVotacion(this);
+    }
+
+    this.puedeIniciarVotacion = function() {
+        this.partida.iniciarVotacion();
+    }
+
+    this.votar = function(sospechoso) {
+        this.estado.votar(sospechoso, this)
+    }
+
+    this.puedeVotar = function(sospechoso) {
+        this.partida.votar(sospechoso, this);
+    }
+
+}
+
+function Vivo() {
+    this.esAtacado = function(usuario) {
+        usuario.puedeSerAtacado();
+    }
+
+    this.iniciarVotacion = function(usuario) {
+        usuario.puedeIniciarVotacion();
+    }
+
+    this.votar = function(sospechoso, votante) {
+        votante.puedeVotar(sospechoso);
+    }
+}
+
+function Muerto() {
+    this.esAtacado = function(usuario) {
+        console.log("Ya estás muerto, no te pueden matar otra vez.");
+    }
+
+    this.iniciarVotacion = function(usuario) {}
+
+    this.votar = function(sospechoso, votante) {}
 }
 
 function randomInt(low, high) {
@@ -259,7 +603,7 @@ function randomInt(low, high) {
 }
 
 function inicio() {
-    juego = new Juego();
+    var juego = new Juego();
     var usr = new Usuario("Pepe", juego);
     var codigo = usr.crearPartida(4);
 
