@@ -1,10 +1,12 @@
+var modelo = require('./modelo.js');
+
 describe("El juego del impostor", function() {
     var juego;
     var usr;
   
     beforeEach(function() {
-      juego = new Juego();
-      usr = new Usuario("Pepe", juego);
+      juego = new modelo.Juego();
+      usr = new modelo.Usuario("Pepe", juego);
     });
 
     it("Comprueba valores iniciales del juego", function() {
@@ -30,7 +32,7 @@ describe("El juego del impostor", function() {
             expect(codigo).not.toBe(undefined);
             expect(juego.partidas[codigo].maximo).toEqual(num);
             expect(juego.partidas[codigo].nickOwner).toEqual(usr.nick);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             expect(Object.keys(juego.partidas[codigo].usuarios).length).toEqual(1);
         });
 
@@ -48,37 +50,37 @@ describe("El juego del impostor", function() {
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(2);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(3);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(4);
-            expect(juego.partidas[codigo].fase instanceof Completado).toBe(true);
+            expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
         });
     
         it("Pepe inicia la partida", function() {
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(2);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(3);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(4);
-            expect(juego.partidas[codigo].fase instanceof Completado).toBe(true);
+            expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
 
             usr.iniciarPartida();
-            expect(juego.partidas[codigo].fase instanceof Jugando).toBe(true);
+            expect(juego.partidas[codigo].fase.esJugando()).toBe(true);
 
             // Comprobar que tienen tareas y el número de impostores
             var nImpostores = 0;
@@ -99,42 +101,42 @@ describe("El juego del impostor", function() {
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(2);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(3);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(4);
-            expect(juego.partidas[codigo].fase instanceof Completado).toBe(true);
+            expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
 
             usr.iniciarPartida();
-            expect(juego.partidas[codigo].fase instanceof Completado).toBe(true);
+            expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
         });
 
         it("Todos abandonan la partida", function() {
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(2);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(3);
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.unirAPartida(codigo, nick);
             var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
             expect(nUsr).toEqual(4);
-            expect(juego.partidas[codigo].fase instanceof Completado).toBe(true);
+            expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
             
             // Revisar (funciona)
             var partida = juego.partidas[codigo];
             juego.abandonarPartida(codigo, "Javier");
-            expect(juego.partidas[codigo].fase instanceof Inicial).toBe(true);
+            expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.abandonarPartida(codigo, "Javier1");
             juego.abandonarPartida(codigo, "Javier2");
@@ -181,7 +183,7 @@ describe("El juego del impostor", function() {
 
             it("Se hecha al impostor (votación) y ganan los tripulantes", function() {
                 juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Votando).toBe(true);
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 // votación
                 // un usuario vota a otro que no está en la partida
@@ -204,8 +206,8 @@ describe("El juego del impostor", function() {
                 
                 // se ha hechado al impostor, termina la partida
                 juego.partidas[codigo].finalizarVotacion();
-                expect(juego.partidas[codigo].usuarios[nickImpostor].estado instanceof Muerto).toBe(true);
-                expect(juego.partidas[codigo].fase instanceof Final).toBe(true);
+                expect(juego.partidas[codigo].usuarios[nickImpostor].estado.esMuerto()).toBe(true);
+                expect(juego.partidas[codigo].fase.esFinal()).toBe(true);
             });
 
             xit("Se hecha a tripulantes (votación) y ganan los impostores", function() {
@@ -213,20 +215,20 @@ describe("El juego del impostor", function() {
                 expect(juego.partidas[codigo].numTripulantesVivos()).toBe(2);
 
                 juego.partidas[codigo].usuarios[nickImpostor].iniciarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Votando).toBe(true);
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 juego.partidas[codigo].usuarios[nickImpostor].votar(juego.partidas[codigo].elegirTripulanteVivo().nick);
                 juego.partidas[codigo].usuarios[juego.partidas[codigo].elegirTripulanteVivo().nick].votar(juego.partidas[codigo].elegirTripulanteVivo().nick);
                 juego.partidas[codigo].usuarios[juego.partidas[codigo].elegirTripulanteVivo().nick].votar(juego.partidas[codigo].elegirTripulanteVivo().nick);
 
                 juego.partidas[codigo].finalizarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Final).toBe(true); */
+                expect(juego.partidas[codigo].fase.esFinal()).toBe(true); */
                 
             })
 
             it("Se vota a un tripulante, es eyectado, y sigue la partida", function() {
                 juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Votando).toBe(true);
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 juego.partidas[codigo].usuarios["Javier"].votar(nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
@@ -242,13 +244,13 @@ describe("El juego del impostor", function() {
                 expect(juego.partidas[codigo].masVotado() === juego.partidas[codigo].usuarios[nickTripulante]).toBe(true);
 
                 juego.partidas[codigo].finalizarVotacion();
-                expect(juego.partidas[codigo].usuarios[nickTripulante].estado instanceof Muerto).toBe(true);
-                expect(juego.partidas[codigo].fase instanceof Jugando).toBe(true);
+                expect(juego.partidas[codigo].usuarios[nickTripulante].estado.esMuerto()).toBe(true);
+                expect(juego.partidas[codigo].fase.esJugando()).toBe(true);
             });
 
             it("Votación con empate, nadie es eyectado y sigue la partida", function() {
                 juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Votando).toBe(true);
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 juego.partidas[codigo].usuarios["Javier"].votar(nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
@@ -265,15 +267,15 @@ describe("El juego del impostor", function() {
                 expect(juego.partidas[codigo].masVotado()).toBe(undefined);
 
                 juego.partidas[codigo].finalizarVotacion();
-                expect(juego.partidas[codigo].usuarios[nickTripulante].estado instanceof Vivo).toBe(true);
-                expect(juego.partidas[codigo].usuarios[nickImpostor].estado instanceof Vivo).toBe(true);
-                expect(juego.partidas[codigo].fase instanceof Jugando).toBe(true);
+                expect(juego.partidas[codigo].usuarios[nickTripulante].estado.esVivo()).toBe(true);
+                expect(juego.partidas[codigo].usuarios[nickImpostor].estado.esVivo()).toBe(true);
+                expect(juego.partidas[codigo].fase.esJugando()).toBe(true);
             });
 
             it("Votación, todos skipean, nadie es eyectado y sigue la partida", function() {
                 // comprobar que los que no voten, al finalizar votación, su voto es skip y haVotado==true
                 juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
-                expect(juego.partidas[codigo].fase instanceof Votando).toBe(true);
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 juego.partidas[codigo].usuarios["Javier"].votar();
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
@@ -298,9 +300,9 @@ describe("El juego del impostor", function() {
                 // Comprobar que todos siguen vivos y que seguimos jugando
                 juego.partidas[codigo].finalizarVotacion();
                 for(key in juego.partidas[codigo].usuarios) {
-                    expect(juego.partidas[codigo].usuarios[key].estado instanceof Vivo).toBe(true);
+                    expect(juego.partidas[codigo].usuarios[key].estado.esVivo()).toBe(true);
                 }
-                expect(juego.partidas[codigo].fase instanceof Jugando).toBe(true);
+                expect(juego.partidas[codigo].fase.esJugando()).toBe(true);
             });
     
             it("El impostor mata hasta ganar la partida", function() {
@@ -309,7 +311,7 @@ describe("El juego del impostor", function() {
                 juego.partidas[codigo].usuarios[nickImpostor].atacar();
                 expect(juego.partidas[codigo].numTripulantesVivos()).toBe(1);
 
-                expect(juego.partidas[codigo].fase instanceof Final).toBe(true);
+                expect(juego.partidas[codigo].fase.esFinal()).toBe(true);
             });
 
         });

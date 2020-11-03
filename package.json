@@ -1,0 +1,23 @@
+{
+  "name": "impostor",
+  "version": "1.0.0",
+  "description": "Trabajo de Procesos 20-21",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jasmine-node servidor"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmaus67/impostor.git"
+  },
+  "author": "Jmaus",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmaus67/impostor/issues"
+  },
+  "homepage": "https://github.com/jmaus67/impostor#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jasmine-node": "^3.0.0"
+  }
+}

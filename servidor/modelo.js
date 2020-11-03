@@ -23,10 +23,26 @@ function Juego() {
             console.log("Has excedido los límites del número de participantes.");
         }
     }
+
+    this.listaPartidas = function() {
+        let lista = [];
+        let huecos = 0;
+
+        for(key in this.partidas) {
+            let partida = this.partidas[key];
+            huecos = partida.numHuecos();
+            
+            if(huecos>0) {
+                lista.push({"codigo": key, "huecos": huecos});
+            }
+        }
+        
+        return lista;
+    }
     
     this.unirAPartida = function(codigo, nick) {
         if(this.partidas[codigo]) {
-            this.partidas[codigo].agregarUsuario(nick);
+            res = this.partidas[codigo].agregarUsuario(nick);
         }
     }
 
@@ -70,7 +86,7 @@ function Partida(num, owner, codigo) {
     this.codigo = codigo;
 
     this.agregarUsuario = function(nick) {
-        this.fase.agregarUsuario(nick, this);
+        return this.fase.agregarUsuario(nick, this);
     }
 
     this.puedeAgregarUsuario = function(nick) {
@@ -187,7 +203,7 @@ function Partida(num, owner, codigo) {
 
     this.puedeVotar = function(sospechoso, votante) {
         // console.log("Has votado a", sospechoso.nick);
-        if(this.usuarios[sospechoso] && this.usuarios[sospechoso].estado instanceof Vivo && !votante.haVotado) {
+        if(this.usuarios[sospechoso] && this.usuarios[sospechoso].estado.esVivo() && !votante.haVotado) {
             this.usuarios[sospechoso].votos++;
             votante.haVotado = true;
             console.log(votante.nick, "ha votado.");
@@ -208,7 +224,7 @@ function Partida(num, owner, codigo) {
 
         // i recibe una string
         for(key in this.usuarios) {
-            if(this.usuarios[key].impostor && (this.usuarios[key].estado instanceof Vivo)) {
+            if(this.usuarios[key].impostor && (this.usuarios[key].estado.esVivo())) {
                 num++;
             }
         }
@@ -221,7 +237,7 @@ function Partida(num, owner, codigo) {
 
         // i recibe una string
         for(key in this.usuarios) {
-            if(!this.usuarios[key].impostor && (this.usuarios[key].estado instanceof Vivo)) {
+            if(!this.usuarios[key].impostor && (this.usuarios[key].estado.esVivo())) {
                 num++;
             }
         }
@@ -299,7 +315,7 @@ function Partida(num, owner, codigo) {
 
         // Poner a los que no han votado, el skip y haVotado a true
         for(key in this.usuarios) {
-            if(this.usuarios[key].estado instanceof Vivo && !this.usuarios[key].haVotado) {
+            if(this.usuarios[key].estado.esVivo() && !this.usuarios[key].haVotado) {
                 this.usuarios[key].skip = true;
                 this.usuarios[key].haVotado = true;
             }
@@ -336,7 +352,7 @@ function Partida(num, owner, codigo) {
 
         // Se guarda en usuarios los usuarios vivos que no son impostores
         for(key in this.usuarios) {
-            if((this.usuarios[key].estado instanceof Vivo) && !this.usuarios[key].impostor) {
+            if((this.usuarios[key].estado.esVivo()) && !this.usuarios[key].impostor) {
                 usuarios.push(key);
             }
         }
@@ -348,6 +364,10 @@ function Partida(num, owner, codigo) {
 
     this.numJugadores = function() {
         return Object.keys(this.usuarios).length;
+    }
+
+    this.numHuecos = function() {
+        return this.maximo - this.numJugadores();
     }
 
     this.comprobarMinimo = function() {
@@ -365,6 +385,26 @@ function Partida(num, owner, codigo) {
 
 // Estados del juego (State)
 function Inicial(){
+    this.esInicial = function() {
+        return true;
+    }
+
+    this.esCompletado = function() {
+        return false;
+    }
+
+    this.esJugando = function() {
+        return false;
+    }
+
+    this.esVotando = function() {
+        return false;
+    }
+
+    this.esFinal = function() {
+        return false;
+    }
+
     this.agregarUsuario = function(nick, partida) {
         partida.puedeAgregarUsuario(nick);
         
@@ -400,6 +440,26 @@ function Inicial(){
 
 // Hay un mínimo de jugadores para empezar la partida
 function Completado(){
+    this.esInicial = function() {
+        return false;
+    }
+
+    this.esCompletado = function() {
+        return true;
+    }
+
+    this.esJugando = function() {
+        return false;
+    }
+
+    this.esVotando = function() {
+        return false;
+    }
+
+    this.esFinal = function() {
+        return false;
+    }
+
     this.agregarUsuario = function(nick, partida) {
         if(partida.comprobarMaximo()) {
             partida.puedeAgregarUsuario(nick);
@@ -440,6 +500,26 @@ function Completado(){
 }
 
 function Jugando(){
+    this.esInicial = function() {
+        return false;
+    }
+
+    this.esCompletado = function() {
+        return false;
+    }
+
+    this.esJugando = function() {
+        return true;
+    }
+
+    this.esVotando = function() {
+        return false;
+    }
+
+    this.esFinal = function() {
+        return false;
+    }
+
     this.agregarUsuario = function(nick, partida) {
         console.log("La partida ya ha comenzado.");
     }
@@ -470,6 +550,26 @@ function Jugando(){
 }
 
 function Votando() {
+    this.esInicial = function() {
+        return false;
+    }
+
+    this.esCompletado = function() {
+        return false;
+    }
+
+    this.esJugando = function() {
+        return false;
+    }
+
+    this.esVotando = function() {
+        return true;
+    }
+
+    this.esFinal = function() {
+        return false;
+    }
+
     this.agregarUsuario = function(nick, partida) {}
 
     this.iniciarPartida = function(partida) {}
@@ -493,6 +593,26 @@ function Votando() {
 
 // Pantalla final? 2 opciones: salir de partida o volver a jugar
 function Final(){
+    this.esInicial = function() {
+        return false;
+    }
+
+    this.esCompletado = function() {
+        return false;
+    }
+
+    this.esJugando = function() {
+        return false;
+    }
+
+    this.esVotando = function() {
+        return false;
+    }
+
+    this.esFinal = function() {
+        return true;
+    }
+
     this.agregarUsuario = function(nick, partida) {
         console.log("La partida ya ha terminado.");
     }
@@ -512,6 +632,10 @@ function Final(){
     }
 
     this.votar = function(sospechoso, votante, partida) {
+        console.log("La partida ya ha terminado.");
+    }
+
+    this.finalizarVotacion = function(partida) {
         console.log("La partida ya ha terminado.");
     }
 }
@@ -575,6 +699,14 @@ function Usuario(nick, juego) {
 }
 
 function Vivo() {
+    this.esVivo = function() {
+        return true;
+    }
+
+    this.esMuerto = function() {
+        return false;
+    }
+
     this.esAtacado = function(usuario) {
         usuario.puedeSerAtacado();
     }
@@ -589,6 +721,14 @@ function Vivo() {
 }
 
 function Muerto() {
+    this.esVivo = function() {
+        return false;
+    }
+
+    this.esMuerto = function() {
+        return true;
+    }
+
     this.esAtacado = function(usuario) {
         console.log("Ya estás muerto, no te pueden matar otra vez.");
     }
@@ -602,14 +742,7 @@ function randomInt(low, high) {
 	return Math.floor(Math.random() * (high - low) + low);
 }
 
-function inicio() {
-    var juego = new Juego();
-    var usr = new Usuario("Pepe", juego);
-    var codigo = usr.crearPartida(4);
 
-    juego.unirAPartida(codigo, "Luis");
-    juego.unirAPartida(codigo, "Luisa");
-    juego.unirAPartida(codigo, "Luiiiis");
 
-    usr.iniciarPartida();
-}
+module.exports.Juego = Juego;
+module.exports.Usuario = Usuario;
