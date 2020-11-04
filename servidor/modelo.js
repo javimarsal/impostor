@@ -5,6 +5,7 @@ function Juego() {
 
     this.crearPartida = function(num, owner) { // número de Jugadores máximo y propietario
         // comprobar los límites de num (entre 4 y 10)
+        let codigo = undefined;
         if (num >= this.minimo && num <= this.maximo) {
             // generar un código de 6 letras aleatorio
             let codigo = this.obtenerCodigo();
@@ -43,6 +44,7 @@ function Juego() {
     this.unirAPartida = function(codigo, nick) {
         if(this.partidas[codigo]) {
             res = this.partidas[codigo].agregarUsuario(nick);
+            return codigo;
         }
     }
 
@@ -101,6 +103,8 @@ function Partida(num, owner, codigo) {
 
         this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
+
+        return this.codigo;
     }
 
     this.iniciarPartida = function() {
