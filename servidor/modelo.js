@@ -13,8 +13,8 @@ function Juego() {
             // comprobar que el número no está en uso
             if(!this.partidas[codigo]) {
                 // crear el objeto partida
-                this.partidas[codigo] = new Partida(num, owner.nick, codigo);
-                owner.partida = this.partidas[codigo];
+                this.partidas[codigo] = new Partida(num, owner, codigo);
+                //owner.partida = this.partidas[codigo];
             }
 
             // Para las pruebas
@@ -25,7 +25,7 @@ function Juego() {
         }
     }
 
-    this.listaPartidas = function() {
+    this.listaPartidasDisponibles = function() {
         let lista = [];
         let huecos = 0;
 
@@ -36,6 +36,19 @@ function Juego() {
             if(huecos>0) {
                 lista.push({"codigo": key, "huecos": huecos});
             }
+        }
+        
+        return lista;
+    }
+
+    this.listaPartidas = function() {
+        let lista = [];
+        let huecos = 0;
+
+        for(key in this.partidas) {
+            let partida = this.partidas[key];
+            let owner = partida.nickOwner;
+            lista.push({"codigo": key, "owner": owner});
         }
         
         return lista;
@@ -75,6 +88,13 @@ function Juego() {
     this.eliminarPartida = function(partida) {
         let codigo = this.obtenerCodigoDePartida(this.partidas, partida);
         delete this.partidas[codigo];
+    }
+
+    this.iniciarPartida = function(nick, codigo) {
+        var owner = this.partidas[codigo].nickOwner;
+        if (nick == owner) {
+            this.partidas[codigo].iniciarPartida();
+        }
     }
 }
 

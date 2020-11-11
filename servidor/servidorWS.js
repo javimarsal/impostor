@@ -19,8 +19,8 @@ function ServidorWS() {
 		io.on('connection', function(socket){ // socket, el cliente que le llega
 		    socket.on('crearPartida', function(nick, numero) {
 		        console.log('usuario: ' + nick + " crea partida numero: " + numero);
-		        var usr = new modelo.Usuario(nick);
-                var codigo = juego.crearPartida(numero, usr);
+		        //var usr = new modelo.Usuario(nick);
+                var codigo = juego.crearPartida(numero, nick);
                 socket.join(codigo);
 		       	cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick});
             });
@@ -36,11 +36,19 @@ function ServidorWS() {
             });
 
             socket.on('iniciarPartida', function(nick, codigo) {
-                // ToDo
-                // controlar si nick es el owner en modelo.js
-                // contestar a todos
+                juego.iniciarPartida(nick, codigo);
                 var fase = juego.partidas[codigo].fase;
-                cli.enviarATodos(socket, codigo, "partidaIniciar", fase);
+                cli.enviarATodos(io, codigo, "partidaIniciar", fase);
+            });
+
+            socket.on('listaPartidasDisponibles', function() {
+                var lista = juego.listaPartidasDisponibles();
+                cli.enviarRemitente(socket, "recibirListaPartidasDisponibles", lista);
+            });
+
+            socket.on('listaPartidas', function() {
+                var lista = juego.listaPartidas();
+                cli.enviarRemitente(socket, "recibirListaPartidas", lista);
             });
 		});
     }
