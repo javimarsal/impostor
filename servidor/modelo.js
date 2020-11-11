@@ -96,6 +96,30 @@ function Juego() {
             this.partidas[codigo].iniciarPartida();
         }
     }
+
+    this.iniciarVotacion = function(nick, codigo) {
+        let usr = this.partidas[codigo].usuarios[nick];
+        usr.iniciarVotacion();
+    }
+
+    this.votarSkip = function(nick, codigo) {
+        let usr = this.partidas[codigo].usuarios[nick];
+        usr.votar();
+    }
+
+    this.votar = function(nick, codigo, sospechoso) {
+        let usr = this.partidas[codigo].usuarios[nick];
+        usr.votar(sospechoso);
+    }
+
+    this.obtenerEncargo = function(nick, codigo) {
+        var resultado = {};
+        var encargo = this.partidas[codigo].usuarios[nick].encargo;
+        var impostor = this.partidas[codigo].usuarios[nick].impostor;
+
+        resultado = {"encargo": encargo, "impostor": impostor};
+        return resultado;
+    }
 }
 
 function Partida(num, owner, codigo) {
@@ -106,6 +130,7 @@ function Partida(num, owner, codigo) {
     this.usuarios = {}; // Diccionario para el control de nombres
     this.numImpostores = 1;
     this.codigo = codigo;
+    this.elegido = "Nadie elegido";
 
     this.agregarUsuario = function(nick) {
         return this.fase.agregarUsuario(nick, this);
@@ -332,6 +357,8 @@ function Partida(num, owner, codigo) {
             this.usuarios[key].skip = false;
             this.usuarios[key].haVotado = false;
         }
+
+        this.elegido = "Nadie elegido";
     }
 
     this.comprobarVotacion = function() {
@@ -347,12 +374,37 @@ function Partida(num, owner, codigo) {
 
         if(elegido && elegido.votos > this.numeroSkips()) {
             elegido.esAtacado();
+            this.elegido = elegido.nick;
             console.log(elegido.nick, "fue eyectado.");
         }
         else {
             console.log("Nadie fue eyectado.");
         }
 
+    }
+
+    this.hanVotadoTodos = function() {
+        let resultado = true;
+
+        for(key in this.usuarios) {
+            if(this.usuarios[key].estado.esVivo() && !this.usuarios[key].haVotado) {
+                resultado = false;
+                break;
+            }
+        }
+
+        return resultado;
+    }
+
+    this.listaHanVotado = function() {
+        var lista = [];
+        for(key in this.usuarios) {
+            if(this.usuarios[key].estado.esVivo() && this.usuarios[key].haVotado) {
+                lista.push(key);
+            }
+        }
+
+        return lista;
     }
 
     this.finalizarVotacion = function() {

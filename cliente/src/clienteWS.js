@@ -16,7 +16,7 @@ function ClienteWS() {
 
     this.unirAPartida = function(codigo, nick) {
         this.nick = nick;
-        this.socket.emit("unirAPartida", codigo, nick); // crearPartida, es un mensaje, tiene que ser igual que el del servidor
+        this.socket.emit("unirAPartida", codigo, nick); // unirAPartida, es un mensaje, tiene que ser igual que el del servidor
         //this.socket.emit("crearPartida", {"nick": nick, "numero": numero});
     }
 
@@ -30,6 +30,28 @@ function ClienteWS() {
     
     this.listaPartidas = function() {
         this.socket.emit("listaPartidas");
+    }
+
+    this.atacar = function() {   
+    }
+
+    this.iniciarVotacion = function() {
+        this.socket.emit("iniciarVotacion", this.nick, this.codigo);
+    }
+
+    this.votar = function(sospechoso) {
+        this.socket.emit("votar", this.nick, this.codigo, sospechoso);
+    }
+
+    this.votarSkip = function() {
+        this.socket.emit("votarSkip", this.nick, this.codigo);
+    }
+
+    this.abandonarPartida = function() {
+    }
+
+    this.obtenerEncargo = function() {
+        this.socket.emit("obtenerEncargo", this.nick, this.codigo)
     }
 	
 
@@ -70,18 +92,35 @@ function ClienteWS() {
         this.socket.on('recibirListaPartidas', function(lista) {
             console.log(lista);
         });
+
+        this.socket.on('votacionLanzada', function(data) {
+            console.log(data);
+        })
+
+        this.socket.on('finalVotacion', function(data) {
+            console.log(data);
+        });
+
+        this.socket.on('haVotado', function(data) {
+            console.log(data);
+        });
+
+        this.socket.on('recibirEncargo', function(data) {
+            console.log(data);
+        });
     }
 
     this.ini();
 
 }
 
-function pruebasWS(codigo) {
-    var ws = new ClienteWS();
-    var ws2 = new ClienteWS();
-    var ws3 = new ClienteWS();
-    var ws4 = new ClienteWS();
-    //var codigo = ws.codigo;
+var ws, ws2, ws3, ws4
+function pruebasWS(/*codigo*/) {
+    ws = new ClienteWS();
+    ws2 = new ClienteWS();
+    ws3 = new ClienteWS();
+    ws4 = new ClienteWS();
+    var codigo = ws.codigo;
 
     ws2.unirAPartida("Juani", codigo);
     ws3.unirAPartida("Juana", codigo);

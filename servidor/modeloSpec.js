@@ -145,7 +145,7 @@ describe("El juego del impostor", function() {
             expect(juego.partidas[codigo]).toBe(undefined);
         });
 
-        describe("Pepe inicia la partida de 4 jugadores, y se llena", function() {
+        describe("Pepe inicia la partida de 4 jugadores, y se llena. Votaciones", function() {
             var num;
             var codigo;
             var nick2;
@@ -183,22 +183,25 @@ describe("El juego del impostor", function() {
             });
 
             it("Se hecha al impostor (votación) y ganan los tripulantes", function() {
-                juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                //juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                juego.iniciarVotacion(nick, codigo);
                 expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 // votación
                 // un usuario vota a otro que no está en la partida
-                juego.partidas[codigo].usuarios["Javier"].votar("Luis");
+                //juego.partidas[codigo].usuarios["Javier"].votar("Luis");
+                juego.votar("Javier", codigo, "Luis");
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(false);
                 
                 // votan al impostor
-                juego.partidas[codigo].usuarios["Javier"].votar(nickImpostor);
+                //juego.partidas[codigo].usuarios["Javier"].votar(nickImpostor);
+                juego.votar("Javier", codigo, nickImpostor);
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Javier1"].votar(nickImpostor);
+                juego.votar("Javier1", codigo, nickImpostor);
                 expect(juego.partidas[codigo].usuarios["Javier1"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Javier2"].votar(nickImpostor);
+                juego.votar("Javier2", codigo, nickImpostor);
                 expect(juego.partidas[codigo].usuarios["Javier2"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Pepe"].votar(nickImpostor);
+                juego.votar("Pepe", codigo, nickImpostor);
                 expect(juego.partidas[codigo].usuarios["Pepe"].haVotado).toBe(true);
 
                 // comprobar votos del impostor
@@ -228,16 +231,18 @@ describe("El juego del impostor", function() {
             })
 
             it("Se vota a un tripulante, es eyectado, y sigue la partida", function() {
-                juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                //juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                juego.iniciarVotacion(nick, codigo);
                 expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
-                juego.partidas[codigo].usuarios["Javier"].votar(nickTripulante);
+                //juego.partidas[codigo].usuarios["Javier"].votar(nickTripulante);
+                juego.votar("Javier", codigo, nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Javier1"].votar(nickTripulante);
+                juego.votar("Javier1", codigo, nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Javier1"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Javier2"].votar(nickTripulante);
+                juego.votar("Javier2", codigo, nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Javier2"].haVotado).toBe(true);
-                juego.partidas[codigo].usuarios["Pepe"].votar(nickTripulante);
+                juego.votar("Pepe", codigo, nickTripulante);
                 expect(juego.partidas[codigo].usuarios["Pepe"].haVotado).toBe(true);
 
                 // Comprobar votos del tripulante
@@ -275,22 +280,26 @@ describe("El juego del impostor", function() {
 
             it("Votación, todos skipean, nadie es eyectado y sigue la partida", function() {
                 // comprobar que los que no voten, al finalizar votación, su voto es skip y haVotado==true
-                juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                //juego.partidas[codigo].usuarios["Javier"].iniciarVotacion();
+                juego.iniciarVotacion(nick, codigo);
                 expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
-                juego.partidas[codigo].usuarios["Javier"].votar();
+                //juego.partidas[codigo].usuarios["Javier"].votar();
+                juego.votarSkip("Javier", codigo);
                 expect(juego.partidas[codigo].usuarios["Javier"].haVotado).toBe(true);
                 expect(juego.partidas[codigo].usuarios["Javier"].skip).toBe(true);
-                juego.partidas[codigo].usuarios["Javier1"].votar();
+                juego.votarSkip("Javier1", codigo);
                 expect(juego.partidas[codigo].usuarios["Javier1"].haVotado).toBe(true);
                 expect(juego.partidas[codigo].usuarios["Javier1"].skip).toBe(true);
-                juego.partidas[codigo].usuarios["Javier2"].votar();
+                juego.votarSkip("Javier2", codigo);
                 expect(juego.partidas[codigo].usuarios["Javier2"].haVotado).toBe(true);
                 expect(juego.partidas[codigo].usuarios["Javier2"].skip).toBe(true);
   
                 // A Pepe se le olvida votar
                 expect(juego.partidas[codigo].usuarios["Pepe"].haVotado).not.toBe(true);
                 expect(juego.partidas[codigo].usuarios["Pepe"].skip).not.toBe(true);
+
+                expect(juego.partidas[codigo].fase.esVotando()).toBe(true);
 
                 // Comprobar votos
                 expect(juego.partidas[codigo].masVotado()).toBe(undefined);
