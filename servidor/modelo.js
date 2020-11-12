@@ -56,8 +56,8 @@ function Juego() {
     
     this.unirAPartida = function(codigo, nick) {
         if(this.partidas[codigo]) {
-            res = this.partidas[codigo].agregarUsuario(nick);
-            return codigo;
+            resultado = this.partidas[codigo].agregarUsuario(nick);
+            return resultado;
         }
     }
 
@@ -120,6 +120,11 @@ function Juego() {
         resultado = {"encargo": encargo, "impostor": impostor};
         return resultado;
     }
+
+    this.atacar = function(nick, codigo) {
+        let usr = this.partidas[codigo].usuarios[nick];
+        return usr.atacar();
+    }
 }
 
 function Partida(num, owner, codigo) {
@@ -149,7 +154,7 @@ function Partida(num, owner, codigo) {
         this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
 
-        return this.codigo;
+        return nuevo;
     }
 
     this.iniciarPartida = function() {
@@ -224,7 +229,7 @@ function Partida(num, owner, codigo) {
     }
 
     this.atacar = function(usuario) {
-        this.fase.atacar(this, usuario);
+        return this.fase.atacar(this, usuario);
     }
 
     this.puedeAtacar = function() {
@@ -235,6 +240,8 @@ function Partida(num, owner, codigo) {
         if(this.comprobarFinal()) {
             console.log("La partida ha terminado.");
         }
+
+        return victima.nick;
     }
 
     // VOTACIONES //
@@ -381,6 +388,8 @@ function Partida(num, owner, codigo) {
             console.log("Nadie fue eyectado.");
         }
 
+        return this.elegido;
+
     }
 
     this.hanVotadoTodos = function() {
@@ -408,15 +417,17 @@ function Partida(num, owner, codigo) {
     }
 
     this.finalizarVotacion = function() {
-        this.fase.finalizarVotacion(this);
+        return this.fase.finalizarVotacion(this);
     }
 
     this.puedeFinalizarVotacion = function() {
-        this.comprobarVotacion();
+        let elegido = this.comprobarVotacion();
         this.reiniciarVotos();
         if(!this.comprobarFinal()) {
             this.fase = new Jugando();
         }
+
+        return elegido;
     }
 
     // TERMINA VOTACIONES //
@@ -461,6 +472,8 @@ function Partida(num, owner, codigo) {
 
 // Estados del juego (State)
 function Inicial(){
+    nombre = "inicial";
+
     this.esInicial = function() {
         return true;
     }
@@ -482,11 +495,13 @@ function Inicial(){
     }
 
     this.agregarUsuario = function(nick, partida) {
-        partida.puedeAgregarUsuario(nick);
+        resultado = partida.puedeAgregarUsuario(nick);
         
         if(partida.comprobarMinimo()) {
             partida.fase = new Completado();
         }
+
+        return resultado;
     }
     
     this.iniciarPartida = function(partida) {
@@ -516,6 +531,8 @@ function Inicial(){
 
 // Hay un mínimo de jugadores para empezar la partida
 function Completado(){
+    nombre = "completado";
+
     this.esInicial = function() {
         return false;
     }
@@ -538,7 +555,7 @@ function Completado(){
 
     this.agregarUsuario = function(nick, partida) {
         if(partida.comprobarMaximo()) {
-            partida.puedeAgregarUsuario(nick);
+            return partida.puedeAgregarUsuario(nick);
         }
         else {
             console.log("Se ha alcanzado el número máximo de jugadores en la partida.");
@@ -576,6 +593,8 @@ function Completado(){
 }
 
 function Jugando(){
+    nombre = "jugando";
+
     this.esInicial = function() {
         return false;
     }
@@ -608,7 +627,7 @@ function Jugando(){
     }
 
     this.atacar = function(partida, usuario) {
-        partida.puedeAtacar(usuario);
+        return partida.puedeAtacar(usuario);
     }
 
     this.iniciarVotacion = function(partida) {
@@ -626,6 +645,8 @@ function Jugando(){
 }
 
 function Votando() {
+    nombre = "votando";
+
     this.esInicial = function() {
         return false;
     }
@@ -663,12 +684,14 @@ function Votando() {
     }
 
     this.finalizarVotacion = function(partida) {
-        partida.puedeFinalizarVotacion();
+        return partida.puedeFinalizarVotacion();
     }
 }
 
 // Pantalla final? 2 opciones: salir de partida o volver a jugar
 function Final(){
+    nombre = "final";
+
     this.esInicial = function() {
         return false;
     }
@@ -740,8 +763,8 @@ function Usuario(nick, juego) {
     }
 
     this.atacar = function() {
-        if(this.impostor == true) {
-            this.partida.atacar(this);
+        if(this.estado.esVivo() && this.impostor) {
+            return this.partida.atacar(this);
         }
         else {
             console.log("No eres impostor, no puedes atacar.");

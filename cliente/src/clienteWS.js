@@ -15,9 +15,8 @@ function ClienteWS() {
     }
 
     this.unirAPartida = function(codigo, nick) {
-        this.nick = nick;
+        //this.nick = nick;
         this.socket.emit("unirAPartida", codigo, nick); // unirAPartida, es un mensaje, tiene que ser igual que el del servidor
-        //this.socket.emit("crearPartida", {"nick": nick, "numero": numero});
     }
 
     this.iniciarPartida = function() {
@@ -32,7 +31,8 @@ function ClienteWS() {
         this.socket.emit("listaPartidas");
     }
 
-    this.atacar = function() {   
+    this.atacar = function() {
+        this.socket.emit("atacar", this.nick, this.codigo);
     }
 
     this.iniciarVotacion = function() {
@@ -73,6 +73,7 @@ function ClienteWS() {
 
         this.socket.on('unidoAPartida', function(data) {
             cli.codigo = data.codigo;
+            cli.nick = data.nickJugador;
             console.log(data);
         });
 
@@ -93,9 +94,13 @@ function ClienteWS() {
             console.log(lista);
         });
 
+        this.socket.on('hasAtacado', function(data) {
+            console.log(data);
+        });
+
         this.socket.on('votacionLanzada', function(data) {
             console.log(data);
-        })
+        });
 
         this.socket.on('finalVotacion', function(data) {
             console.log(data);
