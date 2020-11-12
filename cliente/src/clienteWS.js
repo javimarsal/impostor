@@ -31,8 +31,8 @@ function ClienteWS() {
         this.socket.emit("listaPartidas");
     }
 
-    this.atacar = function() {
-        this.socket.emit("atacar", this.nick, this.codigo);
+    this.atacar = function(victima) {
+        this.socket.emit("atacar", this.nick, this.codigo, victima);
     }
 
     this.iniciarVotacion = function() {

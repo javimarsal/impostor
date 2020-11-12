@@ -121,9 +121,9 @@ function Juego() {
         return resultado;
     }
 
-    this.atacar = function(nick, codigo) {
+    this.atacar = function(nick, codigo, victima) {
         let usr = this.partidas[codigo].usuarios[nick];
-        return usr.atacar();
+        return usr.atacar(victima);
     }
 }
 
@@ -228,20 +228,21 @@ function Partida(num, owner, codigo) {
         }
     }
 
-    this.atacar = function(usuario) {
-        return this.fase.atacar(this, usuario);
+    this.atacar = function(victima) {
+        return this.fase.atacar(this, victima);
     }
 
-    this.puedeAtacar = function() {
+    this.puedeAtacar = function(victima) {
         // Ataca a alguien al azar usando esAtacado() del usuario atacado
-        let victima = this.elegirTripulanteVivo();
-        victima.esAtacado();
+        //let victima = this.elegirTripulanteVivo();
+        let jugadorAtacado = this.usuarios[victima];
+        jugadorAtacado.esAtacado();
         // Comprobar si termina la partida
         if(this.comprobarFinal()) {
             console.log("La partida ha terminado.");
         }
 
-        return victima.nick;
+        return victima;
     }
 
     // VOTACIONES //
@@ -512,7 +513,7 @@ function Inicial(){
         partida.puedeAbandonarPartida(nick, juego);
     }
 
-    this.atacar = function(partida, usuario) {
+    this.atacar = function(partida, victima) {
         console.log("La partida no ha empezado.");
     }
 
@@ -575,7 +576,7 @@ function Completado(){
         partida.puedeAbandonarPartida(nick);
     }
 
-    this.atacar = function(partida, usuario) {
+    this.atacar = function(partida, victima) {
         console.log("La partida no ha empezado.");
     }
 
@@ -626,8 +627,8 @@ function Jugando(){
         // comprobar si termina la partida (más impostores o más tripulantes)
     }
 
-    this.atacar = function(partida, usuario) {
-        return partida.puedeAtacar(usuario);
+    this.atacar = function(partida, victima) {
+        return partida.puedeAtacar(victima);
     }
 
     this.iniciarVotacion = function(partida) {
@@ -673,7 +674,7 @@ function Votando() {
 
     this.abandonarPartida = function(nick, partida, juego) {}
 
-    this.atacar = function(partida, usuario) {}
+    this.atacar = function(partida, victima) {}
 
     this.iniciarVotacion = function(partida) {
         console.log("No puedes iniciar una votación. Ya está en marcha.");
@@ -722,7 +723,7 @@ function Final(){
         partida.puedeAbandonarPartida(nick);
     }
 
-    this.atacar = function(partida, usuario) {
+    this.atacar = function(partida, victima) {
         console.log("La partida ya ha terminado.");
     }
 
@@ -762,9 +763,9 @@ function Usuario(nick, juego) {
         this.partida.abandonarPartida(this.nick);
     }
 
-    this.atacar = function() {
+    this.atacar = function(victima) {
         if(this.estado.esVivo() && this.impostor) {
-            return this.partida.atacar(this);
+            return this.partida.atacar(victima);
         }
         else {
             console.log("No eres impostor, no puedes atacar.");

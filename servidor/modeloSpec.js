@@ -316,11 +316,16 @@ describe("El juego del impostor", function() {
             });
     
             it("El impostor mata hasta ganar la partida", function() {
-                juego.partidas[codigo].usuarios[nickImpostor].atacar();
+                juego.partidas[codigo].usuarios["Javier"].impostor = true;
+                juego.partidas[codigo].usuarios["Javier1"].impostor = false;
+                juego.partidas[codigo].usuarios["Javier2"].impostor = false;
+                juego.partidas[codigo].usuarios["Pepe"].impostor = false;
+                
+                juego.atacar("Javier", codigo, "Javier1");
                 expect(juego.partidas[codigo].numTripulantesVivos()).toBe(2);
-                juego.partidas[codigo].usuarios[nickImpostor].atacar();
+                expect(juego.partidas[codigo].fase.esJugando()).toBe(true);
+                juego.atacar("Javier", codigo, "Javier2");
                 expect(juego.partidas[codigo].numTripulantesVivos()).toBe(1);
-
                 expect(juego.partidas[codigo].fase.esFinal()).toBe(true);
             });
 
