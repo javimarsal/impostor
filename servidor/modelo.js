@@ -473,7 +473,7 @@ function Partida(num, owner, codigo) {
 
 // Estados del juego (State)
 function Inicial(){
-    nombre = "inicial";
+    this.nombre = "inicial";
 
     this.esInicial = function() {
         return true;
@@ -496,7 +496,7 @@ function Inicial(){
     }
 
     this.agregarUsuario = function(nick, partida) {
-        resultado = partida.puedeAgregarUsuario(nick);
+        var resultado = partida.puedeAgregarUsuario(nick);
         
         if(partida.comprobarMinimo()) {
             partida.fase = new Completado();
@@ -532,7 +532,7 @@ function Inicial(){
 
 // Hay un mínimo de jugadores para empezar la partida
 function Completado(){
-    nombre = "completado";
+    this.nombre = "completado";
 
     this.esInicial = function() {
         return false;
@@ -594,7 +594,7 @@ function Completado(){
 }
 
 function Jugando(){
-    nombre = "jugando";
+    this.nombre = "jugando";
 
     this.esInicial = function() {
         return false;
@@ -646,7 +646,7 @@ function Jugando(){
 }
 
 function Votando() {
-    nombre = "votando";
+    this.nombre = "votando";
 
     this.esInicial = function() {
         return false;
@@ -691,7 +691,7 @@ function Votando() {
 
 // Pantalla final? 2 opciones: salir de partida o volver a jugar
 function Final(){
-    nombre = "final";
+    this.nombre = "final";
 
     this.esInicial = function() {
         return false;

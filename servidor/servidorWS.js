@@ -38,8 +38,8 @@ function ServidorWS() {
 
             socket.on('iniciarPartida', function(nick, codigo) {
                 juego.iniciarPartida(nick, codigo);
-                var fase = juego.partidas[codigo].fase;
-                cli.enviarATodos(io, codigo, "partidaIniciar", fase.nombre);
+                var fase = juego.partidas[codigo].fase.nombre;
+                cli.enviarATodos(io, codigo, "partidaIniciar", fase);
             });
 
             socket.on('listaPartidasDisponibles', function() {
@@ -57,10 +57,10 @@ function ServidorWS() {
                 var partida = juego.partidas[codigo];
                 var fase = partida.fase.nombre;
                 if(fase == "final") {
-                    cli.enviarRemitente(socket, 'hasAtacado', {"victima": victima, "fase": fase});
+                    cli.enviarATodos(io, codigo, 'hasAtacado',"Ganan los impostores");
                 }
                 else {
-                    cli.enviarATodos(io, codigo, 'hasAtacado', "Ganan los impostores");
+                    cli.enviarRemitente(socket, 'hasAtacado', {"victima": victima, "fase": fase});
                 }
             });
 
