@@ -68,6 +68,10 @@ function ClienteWS() {
             //console.log("propietario:" + data.owner);
             cli.codigo = data.codigo;
             console.log(data);
+            if(data.codigo != "fallo") {
+                cw.mostrarEsperandoRival();
+            }
+
             //pruebasWS(codigo);
         });
 
@@ -75,6 +79,7 @@ function ClienteWS() {
             cli.codigo = data.codigo;
             cli.nick = data.nickJugador;
             console.log(data);
+            cw.mostrarEsperandoRival();
         });
 
         this.socket.on('nuevoJugador', function(nick) {
@@ -88,6 +93,7 @@ function ClienteWS() {
 
         this.socket.on('recibirListaPartidasDisponibles', function(lista) {
             console.log(lista);
+            cw.mostrarUnirAPartida(lista);
         });
 
         this.socket.on('recibirListaPartidas', function(lista) {
