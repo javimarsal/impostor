@@ -4,25 +4,38 @@ function Juego() {
     this.partidas = {}; // Diccionario (array asociativo)
 
     this.crearPartida = function(num, owner) { // número de Jugadores máximo y propietario
-        // comprobar los límites de num (entre 4 y 10)
-        let codigo = undefined;
-        if (num >= this.minimo && num <= this.maximo) {
-            // generar un código de 6 letras aleatorio
-            let codigo = this.obtenerCodigo();
+        let codigo = "fallo";
         
-            // comprobar que el número no está en uso
-            if(!this.partidas[codigo]) {
+        if(num != undefined && owner != undefined) {
+            // comprobar que el código no está en uso y que el está entre los límites
+            if (!this.partidas[codigo] && this.numeroValido(num)) {
+                // generar un código de 6 letras aleatorio
+                codigo = this.obtenerCodigo();
+
                 // crear el objeto partida
                 this.partidas[codigo] = new Partida(num, owner, codigo);
                 //owner.partida = this.partidas[codigo];
             }
+            else {
+                console.log("Has excedido los límites del número de participantes.");
+            }
+        }
 
-            // Para las pruebas
-            return codigo;
+        return codigo;
+    }
+
+    this.numeroValido = function(num) {
+        return num >= this.minimo && num <= this.maximo;
+    }
+
+    this.obtenerOwner = function(codigo) {
+        let owner = "fallo";
+
+        if(codigo != undefined && this.partidas[codigo]) {
+            owner = this.partidas[codigo].nickOwner;
         }
-        else {
-            console.log("Has excedido los límites del número de participantes.");
-        }
+
+        return owner;
     }
 
     this.listaPartidasDisponibles = function() {
@@ -55,10 +68,13 @@ function Juego() {
     }
     
     this.unirAPartida = function(codigo, nick) {
-        if(this.partidas[codigo]) {
-            resultado = this.partidas[codigo].agregarUsuario(nick);
-            return resultado;
+        let nickJugador = "fallo";
+        
+        if(this.partidas[codigo] && codigo != undefined && nick != undefined) {
+            nickJugador = this.partidas[codigo].agregarUsuario(nick);
         }
+
+        return nickJugador;
     }
 
     this.abandonarPartida = function(codigo, nick) {

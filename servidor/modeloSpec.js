@@ -29,7 +29,7 @@ describe("El juego del impostor", function() {
         
         it("Comprobar la partida", function() {
             expect(num >= juego.minimo && num <= juego.maximo).toBe(true);
-            expect(codigo).not.toBe(undefined);
+            expect(codigo).not.toEqual("fallo");
             expect(juego.partidas[codigo].maximo).toEqual(num);
             expect(juego.partidas[codigo].nickOwner).toEqual(nick);
             expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
@@ -37,14 +37,32 @@ describe("El juego del impostor", function() {
         });
 
         it("No se puede crear partida si el num no está entre los límites", function() {
+            juego = new modelo.Juego();
+            
             // Menor que el mínimo
             var codigo = juego.crearPartida(3, nick);
-            expect(codigo).toBe(undefined);
+            expect(codigo).toEqual("fallo");
+            expect(Object.keys(juego.partidas).length).toEqual(0);
             
             // Mayor que el máximo
             var codigo = juego.crearPartida(11, nick);
-            expect(codigo).toBe(undefined);
-        })
+            expect(codigo).toEqual("fallo");
+            expect(Object.keys(juego.partidas).length).toEqual(0);
+        });
+
+        it("No se puede crear partida si no se pone el num o el nick", function() {
+            juego = new modelo.Juego();
+            
+            // Sin nick
+            var codigo = juego.crearPartida(3,);
+            expect(codigo).toEqual("fallo");
+            expect(Object.keys(juego.partidas).length).toEqual(0);
+            
+            // Sin num ni nick
+            var codigo = juego.crearPartida();
+            expect(codigo).toEqual("fallo");
+            expect(Object.keys(juego.partidas).length).toEqual(0);
+        });
     
         it("Varios usuarios se unen a la partida", function() {
             juego.unirAPartida(codigo, nick2);

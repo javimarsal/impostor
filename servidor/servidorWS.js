@@ -26,12 +26,12 @@ function ServidorWS() {
 		       	cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick});
             });
             
-            socket.on('unirAPartida', function(codigo, nick) {
+            socket.on('unirAPartida', function(nick, codigo) {
                 // puede llegar un nick o codigo nulo
                 var nickJugador = juego.unirAPartida(codigo, nick);
                 console.log('usuario: ' + nickJugador + ' se ha unido a la partida: ' + codigo)
                 socket.join(codigo); // aislamos al cliente en la partida
-                var owner = juego.partidas[codigo].nickOwner;
+                var owner = juego.obtenerOwner(codigo);
                 cli.enviarRemitente(socket, "unidoAPartida", {"codigo": codigo, "owner": owner, "nickJugador": nickJugador});
                 cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", nickJugador);
             });

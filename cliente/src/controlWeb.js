@@ -17,9 +17,13 @@ function ControlWeb($) {
         $('#btnCrearPartida').on('click', function() {
             var nick = $('#nick').val();
             var num = $('#num').val();
-            $('#mostrarCrearPartida').remove();
-            ws.crearPartida(nick, num);
             // controlar
+            if(nick != "" && num != "") {
+                $('#mUAP').remove();
+                $('#mostrarCrearPartida').remove();
+            }
+            
+            ws.crearPartida(nick, num);
             // mostrarEsperandoRival en clienteWS
         });
     }
@@ -36,6 +40,8 @@ function ControlWeb($) {
         $('#mUAP').remove();
         var cadena = '<div id="mUAP">';
         cadena = cadena + '<div class="list-group">';
+
+        // muestra la lista de partidas creadas
         for(var i=0; i<lista.length; i++) {
             cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' huecos: ' + lista[i].huecos + '</a>';
         }
@@ -53,9 +59,13 @@ function ControlWeb($) {
         $('#btnUnir').on('click', function() {
             var nick = $('#nick').val();
             var codigo = StoreValue[0];
-            $('#mUAP').remove();
-            ws.unirAPartida(nick, codigo);
             // controlar
+            if(nick != "" && codigo != null) {
+                $('#mUAP').remove();
+                $('#mostrarCrearPartida').remove();
+            }
+            
+            ws.unirAPartida(nick, codigo);
             // mostrarEsperandoRival en clienteWS
         });
     }

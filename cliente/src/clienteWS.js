@@ -14,9 +14,9 @@ function ClienteWS() {
         //this.socket.emit("crearPartida", {"nick": nick, "numero": numero});
     }
 
-    this.unirAPartida = function(codigo, nick) {
+    this.unirAPartida = function(nick, codigo) {
         //this.nick = nick;
-        this.socket.emit("unirAPartida", codigo, nick); // unirAPartida, es un mensaje, tiene que ser igual que el del servidor
+        this.socket.emit("unirAPartida", nick, codigo); // unirAPartida, es un mensaje, tiene que ser igual que el del servidor
     }
 
     this.iniciarPartida = function() {
@@ -79,7 +79,11 @@ function ClienteWS() {
             cli.codigo = data.codigo;
             cli.nick = data.nickJugador;
             console.log(data);
-            cw.mostrarEsperandoRival();
+            
+            if(data.nickJugador != "fallo" && data.codigo != null) {
+                cw.mostrarEsperandoRival();
+            }
+            
         });
 
         this.socket.on('nuevoJugador', function(nick) {
