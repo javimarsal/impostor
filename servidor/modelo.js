@@ -45,9 +45,10 @@ function Juego() {
         for(key in this.partidas) {
             let partida = this.partidas[key];
             huecos = partida.numHuecos();
+            let maximo = partida.maximo;
             
             if(huecos>0) {
-                lista.push({"codigo": key, "huecos": huecos});
+                lista.push({"codigo": key, "huecos": huecos, "maximo": maximo});
             }
         }
         

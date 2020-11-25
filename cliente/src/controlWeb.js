@@ -7,7 +7,7 @@ function ControlWeb($) {
         cadena = cadena + '</div>';
         cadena = cadena + '<div class="form-group">';
         cadena = cadena +    '<label for="num">Número:</label>';
-        cadena = cadena +    '<input type="text" class="form-control" id="num">';
+        cadena = cadena +    '<input type="number" min="4" max="10" value="4" class="form-control" id="num">';
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-primary" id="btnCrearPartida">Crear Partida</button>';
         cadena = cadena + '</div>';
@@ -26,11 +26,19 @@ function ControlWeb($) {
             ws.crearPartida(nick, num);
             // mostrarEsperandoRival en clienteWS
         });
+
+        
+    }
+
+    this.limpiar = function() {
+        $('#mER').remove();
+        $('#mUAP').remove();
     }
 
     this.mostrarEsperandoRival = function() {
         $('#mER').remove();
         var cadena = '<div id="mER">';
+        cadena = cadena + '<h3>Esperando jugadores</h3>'
         cadena = cadena + '<img src="cliente/img/tenor.gif">';
         cadena = cadena + '</div>';
         $('#esperando').append(cadena);
@@ -43,7 +51,7 @@ function ControlWeb($) {
 
         // muestra la lista de partidas creadas
         for(var i=0; i<lista.length; i++) {
-            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' huecos: ' + lista[i].huecos + '</a>';
+            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].huecos + '/' + lista[i].maximo + '</span> </a>';
         }
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-primary" id="btnUnir">Unir a Partida</button>';
