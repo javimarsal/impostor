@@ -31,6 +31,10 @@ function ClienteWS() {
         this.socket.emit("listaPartidas");
     }
 
+    this.listaJugadores = function() {
+        this.socket.emit("listaJugadores", this.codigo);
+    }
+
     this.atacar = function(victima) {
         this.socket.emit("atacar", this.nick, this.codigo, victima);
     }
@@ -102,6 +106,11 @@ function ClienteWS() {
 
         this.socket.on('recibirListaPartidas', function(lista) {
             console.log(lista);
+        });
+
+        this.socket.on('recibirListaJugadores', function(lista) {
+            console.log(lista);
+            cw.mostrarEsperandoRival(lista);
         });
 
         this.socket.on('hasAtacado', function(data) {

@@ -35,13 +35,40 @@ function ControlWeb($) {
         $('#mUAP').remove();
     }
 
-    this.mostrarEsperandoRival = function() {
+    this.mostrarEsperandoRival = function(lista) {
         $('#mER').remove();
-        var cadena = '<div id="mER">';
+        var cadena = '<div id="mER" class="col-md-6">';
         cadena = cadena + '<h3>Esperando jugadores</h3>'
         cadena = cadena + '<img src="cliente/img/tenor.gif">';
+        cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
         cadena = cadena + '</div>';
+
+        $('#btnIniciarPartida').on('click', function() {
+            nick = ws.nick;
+            codigo = ws.codigo;
+            resultado = ws.iniciarPartida(nick, codigo);
+
+            if(resultado) {
+                $('#mER').remove();
+            }
+                        
+            // mostrar la partida
+        });
+
+        // Mostrar lista de jugadores Arreglar.
+        // tomar el codigo que tiene el cliente ws, para acceder a la partida
+        // ws.codigo
+        /* var cadena = cadena + '<div id="mLJ" class="col-md-6">';
+        cadena = cadena + '<ul class="list-group">';
+        if(lista) {
+            for(var i=0; i<lista.length; i++) {
+                cadena = cadena + '<li class="list-group-item">' + lista[i].nickJugador + '</li>';
+            }
+            cadena = cadena + '</ul>';
+            cadena = cadena + '</div>';
+        } */
         $('#esperando').append(cadena);
+
     }
 
     this.mostrarUnirAPartida = function(lista) {

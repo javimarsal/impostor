@@ -52,6 +52,11 @@ function ServidorWS() {
                 cli.enviarRemitente(socket, "recibirListaPartidas", lista);
             });
 
+            socket.on('listaJugadores', function(codigo) {
+                var lista = juego.listaJugadores(codigo);
+                cli.enviarRemitente(socket, "recibirListaJugadores", lista);
+            });
+
             socket.on('atacar', function(nick, codigo, victima) {
                 var victima = juego.atacar(nick, codigo, victima);
                 var partida = juego.partidas[codigo];

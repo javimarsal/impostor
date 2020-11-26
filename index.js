@@ -25,7 +25,13 @@ app.get('/', function (request, response) {
     
     response.setHeader("Content-type", "text/html");
     response.send(contenido);
+});
+
+app.get('/game', function (request, response) {
+    var contenido = fs.readFileSync(__dirname + "/cliente/index-game.html"); 
     
+    response.setHeader("Content-type", "text/html");
+    response.send(contenido);
 });
 
 // /nombre-ruta-api/:parametro1/:parametro2/:...
