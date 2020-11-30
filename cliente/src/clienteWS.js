@@ -95,8 +95,13 @@ function ClienteWS() {
             //cli.iniciarPartida();
         });
 
-        this.socket.on('partidaIniciar', function(data) {
-            console.log(data);
+        this.socket.on('esperando', function(fase) {
+            console.log('esperando: ' + fase);
+        });
+
+        this.socket.on('partidaIniciada', function(fase) {
+            console.log("Parida en fase: " + fase);
+            lanzarJuego();
         });
 
         this.socket.on('recibirListaPartidasDisponibles', function(lista) {

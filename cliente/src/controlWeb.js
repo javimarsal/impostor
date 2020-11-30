@@ -32,6 +32,7 @@ function ControlWeb($) {
 
     this.limpiar = function() {
         $('#mER').remove();
+        //$('mostrarCP').remove(); //crear partida
         $('#mUAP').remove();
     }
 

@@ -4,6 +4,12 @@
  *  - Tuxemon, https://github.com/Tuxemon/Tuxemon
  */
 
+function lanzarJuego() {
+  cw.limpiar();
+  game = new Phaser.Game(config);
+}
+
+
 const config = {
   type: Phaser.AUTO,
   width: 800,
@@ -23,9 +29,11 @@ const config = {
   }
 };
 
-const game = new Phaser.Game(config);
+//const game = new Phaser.Game(config);
 let cursors;
 let player;
+let jugadores; // colección de jugadores
+let recursos = [{nombre: "ana", frame:0}, {nombre:"pepe", frame:3}]; // datos del personaje si tenemos un sprite con muchos personajes
 let showDebug = false;
 
 function preload() {
@@ -38,7 +46,10 @@ function preload() {
   // If you don't use an atlas, you can do the same thing with a spritesheet, see:
   //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   //this.load.atlas("atlas", "cliente/assets/atlas/atlas.png", "cliente/assets/atlas/atlas.json");
-  this.load.spritesheet("gabe","cliente/assets/images/Male.png",{frameWidth:32,frameHeight:32});
+  this.load.spritesheet("gabe","cliente/assets/images/Male1.png",{frameWidth:32,frameHeight:32});
+  this.load.spritesheet("gabe1","cliente/assets/images/Male2.png",{frameWidth:32,frameHeight:32});
+  this.load.spritesheet("gabe2","cliente/assets/images/Male3.png",{frameWidth:32,frameHeight:32});
+  this.load.spritesheet("gabe3","cliente/assets/images/Male4.png",{frameWidth:32,frameHeight:32});
   //repetir esto por cada personaje diferente
 }
 
@@ -72,7 +83,7 @@ function create() {
     //.sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
     //.setSize(30, 40)
     //.setOffset(0, 24);
-  player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, "gabe");
+  player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, "gabe", recursos[0].frame); // si tenemos un sprite con muchos jugadores
 
   // Watch the player and worldLayer for collisions, for the duration of the scene:
   this.physics.add.collider(player, worldLayer);
@@ -124,9 +135,10 @@ function create() {
     frameRate: 10,
     repeat: -1
   }); */
+  let nombre = recursos[0].nombre;
   const anims = this.anims;
     anims.create({
-      key: "gabe-left-walk",
+      key: nombre+"left-walk",
       frames: anims.generateFrameNames("gabe", {
         //prefix: "misa-left-walk.",
         start: 3,
