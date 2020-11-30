@@ -45,16 +45,13 @@ function ControlWeb($) {
         cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
         cadena = cadena + '</div>';
 
+        $('#esperando').append(cadena); // siempre delante de los botones
+
         $('#btnIniciarPartida').on('click', function() {
             nick = ws.nick;
             codigo = ws.codigo;
-            resultado = ws.iniciarPartida(nick, codigo); // resultado está vacio, es del clienteWS
-
-            if(resultado) {
-                $('#mER').remove();
-            }
-                        
-            // mostrar la partida
+            ws.iniciarPartida(nick, codigo);
+            // se limpiar al lanzarJuego()
         });
 
         // Mostrar lista de jugadores Arreglar.
@@ -69,7 +66,7 @@ function ControlWeb($) {
             cadena = cadena + '</ul>';
             cadena = cadena + '</div>';
         } */
-        $('#esperando').append(cadena);
+        
 
     }
 

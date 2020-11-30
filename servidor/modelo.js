@@ -119,16 +119,15 @@ function Juego() {
     }
 
     this.iniciarPartida = function(nick, codigo) {
-        var resultado = false;
+        resultado = false;
         var owner = this.partidas[codigo].nickOwner;
         if (nick == owner) {
-            resultado = this.partidas[codigo].iniciarPartida();
+            this.partidas[codigo].iniciarPartida();
         }
         else {
             console.log("No puedes iniciar la partida porque no eres el propietario.");
         }
 
-        return resultado;
     }
 
     this.iniciarVotacion = function(nick, codigo) {
@@ -192,7 +191,7 @@ function Partida(num, owner, codigo) {
     }
 
     this.iniciarPartida = function() {
-        return this.fase.iniciarPartida(this);
+        this.fase.iniciarPartida(this);
     }
 
     this.puedeIniciarPartida = function() {
@@ -207,7 +206,6 @@ function Partida(num, owner, codigo) {
         // Asignar impostor: dado el array usuario (Object.keys)
         this.asignarImpostor();
 
-        return true;
     }
 
     // Restablecer todos los valores del usuario, menos lo relacionado con votar
@@ -601,7 +599,7 @@ function Completado(){
     
     this.iniciarPartida = function(partida) {
         if((partida.numJugadores() - partida.numImpostores) > partida.numImpostores) {
-            return partida.puedeIniciarPartida();
+            partida.puedeIniciarPartida();
         }
         else {
             console.log("No se puede iniciar partida. Los impostores ganan.");
