@@ -19,12 +19,13 @@ function ControlWeb($) {
             var num = $('#num').val();
             // controlar
             if(nick != "" && num != "") {
+                // limpiar();
                 $('#mUAP').remove();
                 $('#mostrarCrearPartida').remove();
+                ws.crearPartida(nick, num);
+                // mostrarEsperandoRival en clienteWS
             }
-            
-            ws.crearPartida(nick, num);
-            // mostrarEsperandoRival en clienteWS
+
         });
 
         
@@ -38,7 +39,7 @@ function ControlWeb($) {
 
     this.mostrarEsperandoRival = function(lista) {
         $('#mER').remove();
-        var cadena = '<div id="mER" class="col-md-6">';
+        var cadena = '<div id="mER" class="form-group">';
         cadena = cadena + '<h3>Esperando jugadores</h3>'
         cadena = cadena + '<img src="cliente/img/tenor.gif">';
         cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
@@ -47,7 +48,7 @@ function ControlWeb($) {
         $('#btnIniciarPartida').on('click', function() {
             nick = ws.nick;
             codigo = ws.codigo;
-            resultado = ws.iniciarPartida(nick, codigo);
+            resultado = ws.iniciarPartida(nick, codigo); // resultado está vacio, es del clienteWS
 
             if(resultado) {
                 $('#mER').remove();

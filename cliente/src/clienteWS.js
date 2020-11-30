@@ -96,11 +96,11 @@ function ClienteWS() {
         });
 
         this.socket.on('esperando', function(fase) {
-            console.log('esperando: ' + fase);
+            console.log('esperando: ' + fase); // no se imprime
         });
 
         this.socket.on('partidaIniciada', function(fase) {
-            console.log("Parida en fase: " + fase);
+            console.log("Partida en fase: " + fase); // no se imprime
             lanzarJuego();
         });
 

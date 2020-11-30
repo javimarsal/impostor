@@ -38,12 +38,12 @@ function ServidorWS() {
 
             socket.on('iniciarPartida', function(nick, codigo) {
                 juego.iniciarPartida(nick, codigo);
-                var fase = juego.partidas[codigo].fase.nombre;
+                var fase = juego.partidas[codigo].fase;
                 if (fase.esJugando()) {
-                    cli.enviarATodos(io, codigo, "partidaIniciada", fase);
+                    cli.enviarATodos(io, codigo, "partidaIniciada", fase.nombre);
                 }
                 else {
-                    cli.enviarRemitente(socket, "esperando", fase);
+                    cli.enviarRemitente(socket, "esperando", fase.nombre);
                 }
             });
 
