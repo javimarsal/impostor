@@ -92,7 +92,7 @@ function ClienteWS() {
 
         this.socket.on('nuevoJugador', function(nick) {
             console.log(nick + " se une a la partida");
-            //cli.iniciarPartida();
+            cw.mostrarAvisoNuevoJugador(nick);
         });
 
         this.socket.on('esperando', function(fase) {
@@ -115,7 +115,9 @@ function ClienteWS() {
 
         this.socket.on('recibirListaJugadores', function(lista) {
             console.log(lista);
-            cw.mostrarEsperandoRival(lista);
+            //cw.mostrarEsperandoRival(lista);
+            // Parecido a la lista de partidas
+            // llamar a: cw.mostrarListaJugadores(lista);
         });
 
         this.socket.on('hasAtacado', function(data) {

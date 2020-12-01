@@ -70,6 +70,15 @@ function ControlWeb($) {
 
     }
 
+    this.mostrarAvisoNuevoJugador = function(nick) {
+        cadena = '<li class="list-group-item">' + nick + ' se ha unido</li>';
+        $('#nuevosJugadores').append(cadena);
+
+        $("li").on('click', function() {
+            $(this).hide();
+        });
+    }
+
     this.mostrarUnirAPartida = function(lista) {
         $('#mUAP').remove();
         var cadena = '<div id="mUAP">';
