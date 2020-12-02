@@ -42,7 +42,9 @@ function ControlWeb($) {
         var cadena = '<div id="mER" class="form-group">';
         cadena = cadena + '<h3>Esperando jugadores</h3>'
         cadena = cadena + '<img src="cliente/img/tenor.gif">';
-        cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
+        if(ws.owner) {
+            cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
+        }
         cadena = cadena + '</div>';
 
         $('#esperando').append(cadena); // siempre delante de los botones

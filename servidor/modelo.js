@@ -71,9 +71,10 @@ function Juego() {
     this.listaJugadores = function(codigo) {
         let lista = [];
         let partida = this.partidas[codigo];
-        for(nick in partida.usuarios) {
-            let nickJugador = partida.usuarios[nick];
-            lista.push({"nickJugador": nickJugador});
+        for(key in partida.usuarios) {
+            //let nickJugador = partida.usuarios[key];
+            let numJugador = partida.usuarios[nick].numJugador;
+            lista.push({"nickJugador": key, "numJugador": numJugador});
         }
         
         return lista;
@@ -186,6 +187,7 @@ function Partida(num, owner, codigo) {
 
         this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
+        this.usuarios[nuevo].numJugador = this.numJugadores() - 1;
 
         return nuevo;
     }
@@ -776,6 +778,7 @@ function Final(){
 
 function Usuario(nick, juego) {
     this.nick = nick;
+    this.numJugador;
     this.juego = juego;
     this.partida;
     this.impostor = false;

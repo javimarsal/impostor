@@ -32,9 +32,14 @@ const config = {
 //const game = new Phaser.Game(config);
 let cursors;
 let player;
-let jugadores; // colección de jugadores
-let recursos = [{nombre: "ana", frame:0}, {nombre:"pepe", frame:3}]; // datos del personaje si tenemos un sprite con muchos personajes
+var jugadores = {}; // colección de jugadores remotos, el que crea la partida no se incluye
 let showDebug = false;
+var crear;
+let camera;
+var worldLayer;
+let map;
+var spawnPoint;
+var recursos = [{frame:0, nombre: "ana"}, {frame:3, nombre:"pepe"}, {frame:6, nombre:"oliver"}, {frame:9, nombre:"chaman"}]; // datos del personaje si tenemos un sprite con muchos personajes
 
 function preload() {
   this.load.image("tiles", "cliente/assets/tilesets/tuxmon-sample-32px-extruded.png");
@@ -136,10 +141,11 @@ function create() {
     repeat: -1
   }); */
   let nombre = recursos[0].nombre;
-  const anims = this.anims;
-    anims.create({
-      key: nombre+"left-walk",
-      frames: anims.generateFrameNames("gabe", {
+  const anims1 = this.anims;
+    anims1.create({
+      //key: nombre+"left-walk",
+      key: "gabe-left-walk",
+      frames: anims1.generateFrameNames("gabe", {
         //prefix: "misa-left-walk.",
         start: 3,
         end: 5,
@@ -148,9 +154,9 @@ function create() {
       //frameRate: 10,
       repeat: -1
     });
-    anims.create({
+    anims1.create({
       key: "gabe-right-walk",
-      frames: anims.generateFrameNames("gabe", {
+      frames: anims1.generateFrameNames("gabe", {
         //prefix: "misa-left-walk.",
         start: 6,
         end: 8,
@@ -159,9 +165,9 @@ function create() {
       //frameRate: 10,
       repeat: -1
     });
-    anims.create({
+    anims1.create({
       key: "gabe-front-walk",
-      frames: anims.generateFrameNames("gabe", {
+      frames: anims1.generateFrameNames("gabe", {
         //prefix: "misa-left-walk.",
         start: 0,
         end: 2,
@@ -170,9 +176,9 @@ function create() {
       //frameRate: 10,
       repeat: -1
     });
-    anims.create({
+    anims1.create({
       key: "gabe-back-walk",
-      frames: anims.generateFrameNames("gabe", {
+      frames: anims1.generateFrameNames("gabe", {
         //prefix: "misa-left-walk.",
         start: 9,
         end: 11,
@@ -182,12 +188,154 @@ function create() {
       repeat: -1
     });
 
+  const anims2 = this.anims;
+    anims2.create({
+      //key: nombre+"left-walk",
+      key: "gabe1-left-walk",
+      frames: anims2.generateFrameNames("gabe1", {
+        //prefix: "misa-left-walk.",
+        start: 3,
+        end: 5,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims2.create({
+      key: "gabe1-right-walk",
+      frames: anims2.generateFrameNames("gabe1", {
+        //prefix: "misa-left-walk.",
+        start: 6,
+        end: 8,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims2.create({
+      key: "gabe1-front-walk",
+      frames: anims2.generateFrameNames("gabe1", {
+        //prefix: "misa-left-walk.",
+        start: 0,
+        end: 2,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims2.create({
+      key: "gabe1-back-walk",
+      frames: anims2.generateFrameNames("gabe1", {
+        //prefix: "misa-left-walk.",
+        start: 9,
+        end: 11,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+
+  const anims3 = this.anims;
+    anims3.create({
+      //key: nombre+"left-walk",
+      key: "gabe2-left-walk",
+      frames: anims3.generateFrameNames("gabe2", {
+        //prefix: "misa-left-walk.",
+        start: 3,
+        end: 5,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims3.create({
+      key: "gabe2-right-walk",
+      frames: anims3.generateFrameNames("gabe2", {
+        //prefix: "misa-left-walk.",
+        start: 6,
+        end: 8,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims3.create({
+      key: "gabe2-front-walk",
+      frames: anims3.generateFrameNames("gabe2", {
+        //prefix: "misa-left-walk.",
+        start: 0,
+        end: 2,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims3.create({
+      key: "gabe2-back-walk",
+      frames: anims3.generateFrameNames("gabe2", {
+        //prefix: "misa-left-walk.",
+        start: 9,
+        end: 11,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+
+  const anims4 = this.anims;
+    anims4.create({
+      //key: nombre+"left-walk",
+      key: "gabe3-left-walk",
+      frames: anims4.generateFrameNames("gabe3", {
+        //prefix: "misa-left-walk.",
+        start: 3,
+        end: 5,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims4.create({
+      key: "gabe3-right-walk",
+      frames: anims4.generateFrameNames("gabe3", {
+        //prefix: "misa-left-walk.",
+        start: 6,
+        end: 8,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims4.create({
+      key: "gabe3-front-walk",
+      frames: anims4.generateFrameNames("gabe3", {
+        //prefix: "misa-left-walk.",
+        start: 0,
+        end: 2,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
+    anims4.create({
+      key: "gabe3-back-walk",
+      frames: anims4.generateFrameNames("gabe3", {
+        //prefix: "misa-left-walk.",
+        start: 9,
+        end: 11,
+        //zeroPad: 3
+      }),
+      //frameRate: 10,
+      repeat: -1
+    });
 
   const camera = this.cameras.main;
   camera.startFollow(player);
   camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
   cursors = this.input.keyboard.createCursorKeys(); // usa el teclado
+  lanzarJugador(ws.numJugador);
+  ws.estoyDentro();
 
   // Help text that has a "fixed" position on the screen
   /* this.add
@@ -218,9 +366,73 @@ function create() {
   }); */
 }
 
+function lanzarJugador(numJugador) {
+  player = crear.physics.add.sprite(spawnPoint.x, spawnPoint.y, "varios", recursos[numJugador].frame);    
+  // Watch the player and worldLayer for collisions, for the duration of the scene:
+  crear.physics.add.collider(player, worldLayer);
+  //crear.physics.add.collider(player2, worldLayer);
+  camera = crear.cameras.main;
+  camera.startFollow(player);
+  camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+}
+
+function lanzarJugadorRemoto(nick, numJugador) {
+  var frame = recursos[numJugador].frame;
+  jugadores[nick] = crear.physics.add.sprite(spawnPoint.x+15*numJugador, spawnPoint.y, "varios", frame);
+  crear.physics.add.collider(jugadores[nick], worldLayer);
+}
+
+function moverRemoto(direccion, nick, numJugador) {
+  var remoto = jugadores[nick];
+  const speed = 175;
+  const prevVelocity = remoto.body.velocity.clone();
+
+  const nombre = recursos[numJugador].sprite;
+
+  // Stop any previous movement from the last frame
+  remoto.body.setVelocity(0);
+
+  // Horizontal movement
+  if (direccion.left.isDown) {
+    remoto.body.setVelocityX(-speed);
+    ws.movimiento("left");
+  } else if (direccion.right.isDown) {
+    remoto.body.setVelocityX(speed);
+    ws.movimiento("right");
+  }
+
+  // Vertical movement
+  if (direccion.up.isDown) {
+    remoto.body.setVelocityY(-speed);
+    ws.movimiento("up");
+  } else if (direccion.down.isDown) {
+    remoto.body.setVelocityY(speed);
+    ws.movimiento("down");
+  }
+
+  // Normalize and scale the velocity so that player can't move faster along a diagonal
+  remoto.body.velocity.normalize().scale(speed);
+
+  // Update the animation last and give left/right animations precedence over up/down animations
+  if (direccion.left.isDown) {
+    remoto.anims.play(nombre + "-left-walk", true);
+  } else if (direccion.right.isDown) {
+    remoto.anims.play(nombre + "-right-walk", true);
+  } else if (direccion.up.isDown) {
+    remoto.anims.play(nombre + "-back-walk", true);
+  } else if (direccion.down.isDown) {
+    remoto.anims.play(nombre + "-front-walk", true);
+  } else {
+    remoto.anims.stop();
+  }
+}
+
 function update(time, delta) {
   const speed = 175;
   const prevVelocity = player.body.velocity.clone();
+
+  const nombre = recursos[ws.numJugador].sprite;
 
   // Stop any previous movement from the last frame
   player.body.setVelocity(0);
@@ -228,15 +440,19 @@ function update(time, delta) {
   // Horizontal movement
   if (cursors.left.isDown) {
     player.body.setVelocityX(-speed);
+    ws.movimiento("left");
   } else if (cursors.right.isDown) {
     player.body.setVelocityX(speed);
+    ws.movimiento("right");
   }
 
   // Vertical movement
   if (cursors.up.isDown) {
     player.body.setVelocityY(-speed);
+    ws.movimiento("up");
   } else if (cursors.down.isDown) {
     player.body.setVelocityY(speed);
+    ws.movimiento("down");
   }
 
   // Normalize and scale the velocity so that player can't move faster along a diagonal
@@ -244,13 +460,13 @@ function update(time, delta) {
 
   // Update the animation last and give left/right animations precedence over up/down animations
   if (cursors.left.isDown) {
-    player.anims.play("gabe-left-walk", true);
+    player.anims.play(nombre + "-left-walk", true);
   } else if (cursors.right.isDown) {
-    player.anims.play("gabe-right-walk", true);
+    player.anims.play(nombre + "-right-walk", true);
   } else if (cursors.up.isDown) {
-    player.anims.play("gabe-back-walk", true);
+    player.anims.play(nombre + "-back-walk", true);
   } else if (cursors.down.isDown) {
-    player.anims.play("gabe-front-walk", true);
+    player.anims.play(nombre + "-front-walk", true);
   } else {
     player.anims.stop();
 

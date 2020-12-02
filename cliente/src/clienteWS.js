@@ -2,6 +2,8 @@ function ClienteWS() {
     this.socket = undefined;
     this.nick = undefined;
     this.codigo = undefined;
+    this.owner = false;
+    this.numJugador = undefined;
     
     this.ini = function() {
     	this.socket = io.connect();
@@ -55,7 +57,15 @@ function ClienteWS() {
     }
 
     this.obtenerEncargo = function() {
-        this.socket.emit("obtenerEncargo", this.nick, this.codigo)
+        this.socket.emit("obtenerEncargo", this.nick, this.codigo);
+    }
+
+    this.estoyDentro = function() {
+        this.socket.emit("estoyDentro", this.nick, this.codigo);
+    }
+
+    this.movimiento = function(direccion) {
+        this.socket.emit("movimiento", this.nick, this.codigo, this.numJugador, direccion);
     }
 	
 
@@ -73,6 +83,8 @@ function ClienteWS() {
             cli.codigo = data.codigo;
             console.log(data);
             if(data.codigo != "fallo") {
+                cli.owner = true;
+                cli.numJugador = 0;
                 cw.mostrarEsperandoRival();
             }
 
@@ -82,6 +94,7 @@ function ClienteWS() {
         this.socket.on('unidoAPartida', function(data) {
             cli.codigo = data.codigo;
             cli.nick = data.nickJugador;
+            cli.numJugador = data.numJugador;
             console.log(data);
             
             if(data.nickJugador != "fallo" && data.codigo != null) {
@@ -100,13 +113,17 @@ function ClienteWS() {
         });
 
         this.socket.on('partidaIniciada', function(fase) {
+            cli.obtenerEncargo();
             console.log("Partida en fase: " + fase); // no se imprime
             lanzarJuego();
         });
 
         this.socket.on('recibirListaPartidasDisponibles', function(lista) {
             console.log(lista);
-            cw.mostrarUnirAPartida(lista);
+            if(!cli.codigo) { // ni se ha unido, ni ha creado partida, codigo = undefined
+                cw.mostrarUnirAPartida(lista);
+            }
+            
         });
 
         this.socket.on('recibirListaPartidas', function(lista) {
@@ -138,6 +155,20 @@ function ClienteWS() {
 
         this.socket.on('recibirEncargo', function(data) {
             console.log(data);
+        });
+
+        this.socket.on('dibujarRemoto', function(lista) {
+            console.log(lista);
+            for(var i=0; i<lista.length; i++) {
+                if(lista[i].nick!=cli.nick) {
+                    lanzarJugadorRemoto(lista[i].nick, lista[i].numJugador);
+                }
+            }
+            
+        });
+
+        this.socket.on('moverRemoto', function(datos) {
+            moverRemoto(datos.direccion, datos.nick, datos.numJugador);
         });
     }
 
