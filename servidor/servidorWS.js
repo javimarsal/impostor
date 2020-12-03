@@ -134,8 +134,8 @@ function ServidorWS() {
                 cli.enviarRemitente(socket, "dibujarRemoto", lista)
             });
 
-            socket.on('movimiento', function(nick, codigo, numJugador, direccion) {
-                var datos = {nick:nick, numJugador:numJugador, direccion:direccion};
+            socket.on('movimiento', function(nick, codigo, numJugador, x, y) {
+                var datos = {nick:nick, numJugador:numJugador, x:x, y:y};
                 cli.enviarATodosMenosRemitente(socket, codigo, "moverRemoto", datos);
             });
 		});
