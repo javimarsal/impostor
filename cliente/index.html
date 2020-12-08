@@ -13,36 +13,55 @@
     <script src="cliente/src/controlWeb.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
     <script src="cliente/src/game.js"></script>
-
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+        
+        .bg {
+            /* The image used */
+            background-image: url("cliente/img/background.png");
+        
+            /* Full height */
+            height: 100%; 
+            
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
 </head>
 <body>
     <!-- El punto de entrada de mi aplicación -->
     
     
-    
-    <div class="container text-center">
-        <div class="jumbotron" style="background-image: url(cliente/img/among_cover.jpg); background-size: cover; opacity: 0.7">
-            <h2 style="color:white"><b>Impostor app</b></h2>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div id="crearPartida"></div>
-                <div id="esperando"></div>
+    <div class="bg">
+        <div class="container text-center">
+            <div class="jumbotron" id="cabecera" style="background-image: url(cliente/img/among_cover.jpg); background-size: cover;">
+                <h2 style="color:white"><b>Impostor app</b></h2>
             </div>
-            <div class="col-md-6">
-                <div id="unirAPartida"></div>
-            </div>
-            <div class="col-md-6">
-                <div id="avisos">
-                    <ul id="nuevosJugadores" class="list-group"></ul>
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="crearPartida"></div>
+                    <div id="esperando"></div>
+                </div>
+                <div class="col-md-6">
+                    <div id="unirAPartida"></div>
+                </div>
+                <div class="col-md-6">
+                    <div id="avisos">
+                        <ul id="nuevosJugadores" class="list-group"></ul>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div id="game-container"></div>
+            <div class="row">
+                <div id="game-container"></div>
+            </div>
         </div>
     </div>
-    
+
     <script>
         var rest = new ClienteRest();
         var ws = new ClienteWS();
