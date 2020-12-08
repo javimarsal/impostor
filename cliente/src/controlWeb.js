@@ -1,15 +1,15 @@
 function ControlWeb($) {
     this.mostrarCrearPartida = function() {
         var cadena = '<div id="mostrarCrearPartida">';
-        cadena = cadena + '<div class="form-group">';
-        cadena = cadena +    '<label for="nick">Nick:</label>';
+        cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
+        cadena = cadena +    '<label for="nick"><b>Nick:</b></label>';
         cadena = cadena +    '<input type="text" class="form-control" id="nick">';
         cadena = cadena + '</div>';
-        cadena = cadena + '<div class="form-group">';
-        cadena = cadena +    '<label for="num">Número:</label>';
-        cadena = cadena +    '<input type="number" min="4" max="10" value="4" class="form-control" id="num">';
+        cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
+        cadena = cadena +    '<label for="num"><b>Número:</b></label>';
+        cadena = cadena +    '<input type="number" min="2" max="10" value="2" class="form-control" id="num">';
         cadena = cadena + '</div>';
-        cadena = cadena + '<button type="button" class="btn btn-primary" id="btnCrearPartida">Crear Partida</button>';
+        cadena = cadena + '<button type="button" class="btn btn-success" id="btnCrearPartida">Crear Partida</button>';
         cadena = cadena + '</div>';
 
         $('#crearPartida').append(cadena);
@@ -39,17 +39,22 @@ function ControlWeb($) {
 
     this.mostrarEsperandoRival = function(lista) {
         $('#mER').remove();
-        var cadena = '<div id="mER" class="form-group">';
-        cadena = cadena + '<h3>Esperando jugadores</h3>'
-        cadena = cadena + '<img src="cliente/img/tenor.gif">';
+        var cadena = '<div id="mER">';
+        cadena = cadena + '<h3 style="color:rgb(255, 238, 0)"><b>Esperando jugadores</b></h3>'
+        cadena = cadena + '<img src="cliente/img/among_esperando.gif">';
         if(ws.owner) {
-            cadena = cadena + '<button type="button" class="btn btn-primary" id="btnIniciarPartida">Iniciar Partida</button>';
+            cadena = cadena + '<div>';
+            cadena = cadena + '<button type="button" class="btn btn-success" id="btnIniciarPartida">Iniciar Partida</button>';
+            cadena = cadena + '</div>';
         }
         cadena = cadena + '</div>';
 
         $('#esperando').append(cadena); // siempre delante de los botones
 
         $('#btnIniciarPartida').on('click', function() {
+            $('#nuevosJugadores').remove();
+            //<$('#cabecera').remove();
+            
             nick = ws.nick;
             codigo = ws.codigo;
             ws.iniciarPartida(nick, codigo);
@@ -91,7 +96,7 @@ function ControlWeb($) {
             cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].huecos + '/' + lista[i].maximo + '</span> </a>';
         }
         cadena = cadena + '</div>';
-        cadena = cadena + '<button type="button" class="btn btn-primary" id="btnUnir">Unir a Partida</button>';
+        cadena = cadena + '<button type="button" class="btn btn-success" id="btnUnir">Unir a Partida</button>';
         cadena = cadena + '</div>';
         $('#unirAPartida').append(cadena);
 

@@ -64,8 +64,8 @@ function ClienteWS() {
         this.socket.emit("estoyDentro", this.nick, this.codigo);
     }
 
-    this.movimiento = function(direccion) {
-        this.socket.emit("movimiento", this.nick, this.codigo, this.numJugador, direccion);
+    this.movimiento = function(x, y) {
+        this.socket.emit("movimiento", this.nick, this.codigo, this.numJugador, x, y);
     }
 	
 
@@ -168,7 +168,8 @@ function ClienteWS() {
         });
 
         this.socket.on('moverRemoto', function(datos) {
-            moverRemoto(datos.direccion, datos.nick, datos.numJugador);
+            mover(datos.nick, datos.x, datos.y);
+            //moverRemoto(direccion)
         });
     }
 
