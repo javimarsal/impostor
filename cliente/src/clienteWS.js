@@ -64,8 +64,8 @@ function ClienteWS() {
         this.socket.emit("estoyDentro", this.nick, this.codigo);
     }
 
-    this.movimiento = function(x, y) {
-        this.socket.emit("movimiento", this.nick, this.codigo, this.numJugador, x, y);
+    this.movimiento = function(direccion, x, y) {
+        this.socket.emit("movimiento", this.nick, this.codigo, this.numJugador, direccion, x, y);
     }
 	
 
@@ -160,16 +160,15 @@ function ClienteWS() {
         this.socket.on('dibujarRemoto', function(lista) {
             console.log(lista);
             for(var i=0; i<lista.length; i++) {
-                if(lista[i].nick!=cli.nick) {
-                    lanzarJugadorRemoto(lista[i].nick, lista[i].numJugador);
+                if(lista[i].nickJugador!=cli.nick) {
+                    lanzarJugadorRemoto(lista[i].nickJugador, lista[i].numJugador);
                 }
             }
             
         });
 
         this.socket.on('moverRemoto', function(datos) {
-            mover(datos.nick, datos.x, datos.y);
-            //moverRemoto(direccion)
+            mover(datos.direccion, datos.nick, datos.numJugador, datos.x, datos.y);
         });
     }
 
