@@ -384,10 +384,15 @@ function lanzarJugadorRemoto(nick, numJugador) {
   crear.physics.add.collider(jugadores[nick], worldLayer);
 }
 
-function mover(direccion, nick, numJugador, x, y) {
+function mover(datos) {
+  var direccion = datos.direccion;
+  var nick = datos.nick;
+  var numJugador = datos.numJugador;
+  var x = datos.x;
+  var y = datos.y;
   var remoto = jugadores[nick];
-    const speed = 175;
-    const nombre = recursos[numJugador].sprite;
+  const speed = 175;
+  const nombre = recursos[numJugador].sprite;
   if(remoto) {
     const prevVelocity = remoto.body.velocity.clone();
     remoto.body.setVelocity(0);
@@ -476,7 +481,7 @@ function update(time, delta) {
   // Vertical movement
   if (cursors.up.isDown) {
     player.body.setVelocityY(-speed);
-    direccion = "up"
+    direccion = "up";
   } else if (cursors.down.isDown) {
     player.body.setVelocityY(speed);
     direccion = "down";
