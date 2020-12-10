@@ -1,5 +1,5 @@
 function ControlWeb($) {
-    this.mostrarCrearPartida = function() {
+    this.mostrarCrearPartida = function(min) {
         var cadena = '<div id="mostrarCrearPartida">';
         cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
         cadena = cadena +    '<label for="nick"><b>Nick:</b></label>';
@@ -7,7 +7,7 @@ function ControlWeb($) {
         cadena = cadena + '</div>';
         cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
         cadena = cadena +    '<label for="num"><b>Número:</b></label>';
-        cadena = cadena +    '<input type="number" min="4" max="10" value="4" class="form-control" id="num">';
+        cadena = cadena +    '<input type="number" min="'+ min +'" max="10" value="'+ min +'" class="form-control" id="num">';
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-success" id="btnCrearPartida">Crear Partida</button>';
         cadena = cadena + '</div>';

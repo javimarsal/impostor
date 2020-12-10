@@ -1,5 +1,5 @@
-function Juego() {
-    this.minimo = 4;
+function Juego(min) {
+    this.minimo = min;
     this.maximo = 10;
     this.partidas = {}; // Diccionario (array asociativo)
 

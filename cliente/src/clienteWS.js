@@ -4,6 +4,9 @@ function ClienteWS() {
     this.codigo = undefined;
     this.owner = false;
     this.numJugador = undefined;
+    this.impostor = false;
+    this.estado;
+    this.encargo;
     
     this.ini = function() {
     	this.socket = io.connect();
@@ -86,6 +89,7 @@ function ClienteWS() {
             if(data.codigo != "fallo") {
                 cli.owner = true;
                 cli.numJugador = 0;
+                cli.estado = "vivo";
                 cw.mostrarEsperandoRival();
             }
 
@@ -96,6 +100,7 @@ function ClienteWS() {
             cli.codigo = data.codigo;
             cli.nick = data.nickJugador;
             cli.numJugador = data.numJugador;
+            cli.estado = "vivo";
             console.log(data);
             
             if(data.nickJugador != "fallo" && data.codigo != null) {
@@ -142,8 +147,17 @@ function ClienteWS() {
             console.log(data);
         });
 
+        this.socket.on('muereInocente', function(inocente) {
+            console.log('muere ' + inocente);
+            if(cli.inocente == inocente) {
+                cli.estado = "muerto";
+            }
+            dibujarMuereInocente(inocente);
+        })
+
         this.socket.on('votacionLanzada', function(data) {
             console.log(data);
+            //dibujarVotacion(lista)
         });
 
         this.socket.on('finalVotacion', function(data) {
@@ -156,6 +170,11 @@ function ClienteWS() {
 
         this.socket.on('recibirEncargo', function(data) {
             console.log(data);
+            if(data.impostor) {
+                $('#avisarImpostor').modal("show");
+                cli.impostor = data.impostor;
+                cli.encargo = data.encargo;
+            }
         });
 
         this.socket.on('dibujarRemoto', function(lista) {
@@ -163,6 +182,7 @@ function ClienteWS() {
             for(var i=0; i<lista.length; i++) {
                 if(lista[i].nickJugador!=cli.nick) {
                     lanzarJugadorRemoto(lista[i].nickJugador, lista[i].numJugador);
+                    crearColision();
                 }
             }
             

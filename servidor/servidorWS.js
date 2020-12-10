@@ -74,12 +74,11 @@ function ServidorWS() {
                 var victima = juego.atacar(nick, codigo, victima);
                 var partida = juego.partidas[codigo];
                 var fase = partida.fase.nombre;
+                cli.enviarATodos(io, codigo, 'muereInocente', victima);
                 if(fase == "final") {
                     cli.enviarATodos(io, codigo, 'hasAtacado',"Ganan los impostores");
                 }
-                else {
-                    cli.enviarRemitente(socket, 'hasAtacado', {"victima": victima, "fase": fase});
-                }
+                
             });
 
             socket.on('iniciarVotacion', function(nick, codigo) {
