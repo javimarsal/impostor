@@ -48,6 +48,7 @@ var teclaA;
 var teclaV;
 var teclaT;
 
+
 function preload() {
   this.load.image("tiles", "cliente/assets/tilesets/tuxmon-sample-32px-extruded.png");
   this.load.tilemapTiledJSON("map", "cliente/assets/tilemaps/tuxemon-town.json");
