@@ -35,6 +35,7 @@ function ControlWeb($) {
         $('#mER').remove();
         //$('mostrarCP').remove(); //crear partida
         $('#mUAP').remove();
+        $('#nuevosJugadores').remove();
     }
 
     this.mostrarEsperandoRival = function(lista) {
@@ -52,7 +53,6 @@ function ControlWeb($) {
         $('#esperando').append(cadena); // siempre delante de los botones
 
         $('#btnIniciarPartida').on('click', function() {
-            $('#nuevosJugadores').remove();
             //<$('#cabecera').remove();
             
             nick = ws.nick;
@@ -113,10 +113,9 @@ function ControlWeb($) {
             if(nick != "" && codigo != null) {
                 $('#mUAP').remove();
                 $('#mostrarCrearPartida').remove();
+                ws.unirAPartida(nick, codigo);
             }
             
-            ws.unirAPartida(nick, codigo);
-            // mostrarEsperandoRival en clienteWS
         });
     }
 }
