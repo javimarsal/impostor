@@ -113,10 +113,9 @@ function ControlWeb($) {
             if(nick != "" && codigo != null) {
                 $('#mUAP').remove();
                 $('#mostrarCrearPartida').remove();
+                ws.unirAPartida(nick, codigo);
             }
             
-            ws.unirAPartida(nick, codigo);
-            // mostrarEsperandoRival en clienteWS
         });
     }
 }

@@ -163,7 +163,7 @@ function Juego(min) {
 
 function Partida(num, owner, codigo) {
     this.maximo = num; // número max de usuarios
-    this.minimo = 4;
+    this.minimo = 2;
     this.nickOwner = owner;
     this.fase = new Inicial();
     this.usuarios = {}; // Diccionario para el control de nombres
@@ -600,12 +600,12 @@ function Completado(){
     }
     
     this.iniciarPartida = function(partida) {
-        if((partida.numJugadores() - partida.numImpostores) > partida.numImpostores) {
+        //if((partida.numJugadores() - partida.numImpostores) > partida.numImpostores) {
             partida.puedeIniciarPartida();
-        }
-        else {
+        //}
+        //else {
             console.log("No se puede iniciar partida. Los impostores ganan.");
-        }
+        //}
     }
 
     this.abandonarPartida = function(nick, partida, juego) {
