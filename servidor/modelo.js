@@ -13,7 +13,7 @@ function Juego(min) {
                 codigo = this.obtenerCodigo();
 
                 // crear el objeto partida
-                this.partidas[codigo] = new Partida(num, owner, codigo);
+                this.partidas[codigo] = new Partida(num, owner, codigo, this.minimo);
                 //owner.partida = this.partidas[codigo];
             }
             else {
@@ -161,9 +161,9 @@ function Juego(min) {
     }
 }
 
-function Partida(num, owner, codigo) {
+function Partida(num, owner, codigo, minimo) {
     this.maximo = num; // número max de usuarios
-    this.minimo = 4;
+    this.minimo = minimo;
     this.nickOwner = owner;
     this.fase = new Inicial();
     this.usuarios = {}; // Diccionario para el control de nombres
