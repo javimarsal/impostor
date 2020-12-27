@@ -5,7 +5,7 @@ describe("El juego del impostor", function() {
     var nick;
 
     beforeEach(function() {
-      juego = new modelo.Juego();
+      juego = new modelo.Juego(4);
       nick = "Pepe";
     });
 
@@ -345,6 +345,25 @@ describe("El juego del impostor", function() {
                 juego.atacar("Javier", codigo, "Javier2");
                 expect(juego.partidas[codigo].numTripulantesVivos()).toBe(1);
                 expect(juego.partidas[codigo].fase.esFinal()).toBe(true);
+            });
+
+            it("Realizar tareas", function() {
+                var partida = juego.partidas[codigo]; // la partida debe estar iniciada
+                expect(partida.obtenerPercentGlobal()).toEqual(25);
+
+                for(var i=0; i<9; i++) { // 10 es el máximo de las tareas
+                    for(nick in partida.usuarios) {
+                        partida.usuarios[nick].realizarTarea();
+                    }
+                    expect(partida.fase.esJugando()).toBe(true);
+                    expect(partida.obtenerPercentGlobal()).toEqual((25 + (i+1)*75)/10);
+                }
+
+                for(nick in partida.usuarios) {
+                    partida.usuarios[nick].realizarTarea();
+                }
+                expect(partida.obtenerPercentGlobal()).toEqual(100);
+                expect(partida.fase.esFinal()).toBe(true);
             });
 
         });

@@ -47,6 +47,9 @@ var muertos;
 var teclaA;
 var teclaV;
 var teclaT;
+var tareasOn = true;
+var ataquesOn = true;
+var final = false;
 
 
 function preload() {
@@ -354,46 +357,21 @@ function create() {
   lanzarJugador(ws.nick, ws.numJugador);
   ws.estoyDentro();
 
-  // Help text that has a "fixed" position on the screen
-  /* this.add
-    .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
-      font: "18px monospace",
-      fill: "#000000",
-      padding: { x: 20, y: 10 },
-      backgroundColor: "#ffffff"
-    })
-    .setScrollFactor(0)
-    .setDepth(30); */
-
-  // Debug graphics
-  /* this.input.keyboard.once("keydown_D", event => {
-    // Turn on physics debugging to show player's hitbox
-    this.physics.world.createDebugGraphic();
-
-    // Create worldLayer collision graphic above the player, but below the help text
-    const graphics = this.add
-      .graphics()
-      .setAlpha(0.75)
-      .setDepth(20);
-    worldLayer.renderDebug(graphics, {
-      tileColor: null, // Color of non-colliding tiles
-      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    });
-  }); */
 }
 
 function crearColision() {
   if(crear && ws.impostor) { // solo para el impostor
-    crear.physics.add.overlap(player, remotos, kill); // player es el jugador local
+    crear.physics.add.overlap(player, remotos, kill, ()=>{return ataquesOn}); // player es el jugador local
   }
 }
 
-function kill(sprite, inocente) { //sprite es el impostor
+function kill(sprite, inocente) { //sprite es el impostor, inocente(igual se llama victima)
   // dibujar el inocente muerto
   // avisar del ataque
   var nick = inocente.nick;
+
   if(teclaA.isDown) {
+    ataquesOn = false;
     ws.atacar(nick);
   }
 }
@@ -422,23 +400,29 @@ function votacion(sprite, muerto) {
 }
 
 
-function tareas(sprite, tarea) { // objeto tarea con el que colisiona
-  // ¿el jugador puede realizar la tarea?
-  // en tal caso, permitir realizar la tarea
-  // dibujar la tarea
-  tarea.nombre = "jardines";
-  if(ws.encargo == tarea.nombre) {
+function tareas(sprite, objeto) { // objeto, tarea con el que colisiona
+  if(ws.encargo == objeto.properties.tarea && teclaT.isDown) {
+    tareasOn = false; // Es como un semáforo. Para que cuando pulsemos la T muchas veces, no se habrán más modales
+    // tareasOn, poner a true cuando acabe o al cerrar el modal de la tarea
     console.log("realizar tarea " + ws.encargo);
-    ws.realizarTarea();
+    ws.realizarTarea(); // o hacer la llamada desde cw, cuando se cierre el modal
+    cw.mostrarModalTarea(ws.encargo);
+    //var estadoPartida = juego.getEstadoPartida(ws.codigo);
   }
+
+  
+  /* if(estadoPartida.esFinal()) {
+    juego.terminarPartida();
+  } */
 }
 
 
 function lanzarJugador(nick, numJugador) {
-  player = crear.physics.add.sprite(spawnPoint.x, spawnPoint.y, "gabe", recursos[numJugador].frame);
+  var x = spawnPoint.x + numJugador*32 + 2; // 32, ancho del sprite
+  player = crear.physics.add.sprite(x, spawnPoint.y, "gabe", recursos[numJugador].frame);
   // Watch the player and worldLayer for collisions, for the duration of the scene:
   crear.physics.add.collider(player, worldLayer);
-  crear.physics.add.collider(player, capaTareas, tareas);
+  crear.physics.add.collider(player, capaTareas, tareas, ()=>{return tareasOn});
   //crear.physics.add.collider(player2, worldLayer);
   jugadores[nick] = player;
   jugadores[nick].nick = nick;
@@ -451,8 +435,9 @@ function lanzarJugador(nick, numJugador) {
 }
 
 function lanzarJugadorRemoto(nick, numJugador) {
+  var x = spawnPoint.x + numJugador*32 + 2;
   var frame = recursos[numJugador].frame;
-  jugadores[nick] = crear.physics.add.sprite(spawnPoint.x+15*numJugador, spawnPoint.y, "gabe", frame);
+  jugadores[nick] = crear.physics.add.sprite(x+15*numJugador, spawnPoint.y, "gabe", frame);
   crear.physics.add.collider(jugadores[nick], worldLayer); // el sprite colisiona con la capa "worldLayer"
   jugadores[nick].nick = nick;
   jugadores[nick].numJugador = numJugador;
@@ -468,7 +453,7 @@ function mover(datos) {
   var remoto = jugadores[nick];
   const speed = 175;
   const nombre = recursos[numJugador].sprite;
-  if(remoto) {
+  if(remoto && !final) {
     const prevVelocity = remoto.body.velocity.clone();
     remoto.body.setVelocity(0);
     remoto.setX(x);
@@ -489,6 +474,12 @@ function mover(datos) {
 
 }
 
+function finPartida(data) {
+  final = true;
+  //remoto = undefined;
+  cw.mostrarModalSimple("Fin de la partida. " + data);
+}
+
 
 
 function update(time, delta) {
@@ -497,49 +488,51 @@ function update(time, delta) {
   const prevVelocity = player.body.velocity.clone();
 
   const nombre = recursos[ws.numJugador].sprite;
+  if(!final) {
+  
+    // Stop any previous movement from the last frame
+    player.body.setVelocity(0);
 
-  // Stop any previous movement from the last frame
-  player.body.setVelocity(0);
+    // Horizontal movement
+    if (cursors.left.isDown) {
+      player.body.setVelocityX(-speed);
+      direccion = "left";
+    } else if (cursors.right.isDown) {
+      player.body.setVelocityX(speed);
+      direccion = "right";
+    }
 
-  // Horizontal movement
-  if (cursors.left.isDown) {
-    player.body.setVelocityX(-speed);
-    direccion = "left";
-  } else if (cursors.right.isDown) {
-    player.body.setVelocityX(speed);
-    direccion = "right";
-  }
+    // Vertical movement
+    if (cursors.up.isDown) {
+      player.body.setVelocityY(-speed);
+      direccion = "up";
+    } else if (cursors.down.isDown) {
+      player.body.setVelocityY(speed);
+      direccion = "down";
+    }
 
-  // Vertical movement
-  if (cursors.up.isDown) {
-    player.body.setVelocityY(-speed);
-    direccion = "up";
-  } else if (cursors.down.isDown) {
-    player.body.setVelocityY(speed);
-    direccion = "down";
-  }
+    // Normalize and scale the velocity so that player can't move faster along a diagonal
+    player.body.velocity.normalize().scale(speed);
 
-  // Normalize and scale the velocity so that player can't move faster along a diagonal
-  player.body.velocity.normalize().scale(speed);
+    ws.movimiento(direccion, player.x, player.y);
+    // Update the animation last and give left/right animations precedence over up/down animations
+    if (cursors.left.isDown) {
+      player.anims.play(nombre + "-left-walk", true);
+    } else if (cursors.right.isDown) {
+      player.anims.play(nombre + "-right-walk", true);
+    } else if (cursors.up.isDown) {
+      player.anims.play(nombre + "-back-walk", true);
+    } else if (cursors.down.isDown) {
+      player.anims.play(nombre + "-front-walk", true);
+    } else {
+      player.anims.stop();
 
-  ws.movimiento(direccion, player.x, player.y);
-  // Update the animation last and give left/right animations precedence over up/down animations
-  if (cursors.left.isDown) {
-    player.anims.play(nombre + "-left-walk", true);
-  } else if (cursors.right.isDown) {
-    player.anims.play(nombre + "-right-walk", true);
-  } else if (cursors.up.isDown) {
-    player.anims.play(nombre + "-back-walk", true);
-  } else if (cursors.down.isDown) {
-    player.anims.play(nombre + "-front-walk", true);
-  } else {
-    player.anims.stop();
-
-    
-    // If we were moving, pick and idle frame to use
-    /* if (prevVelocity.x < 0) player.setTexture("gabe", "gabe-left-walk");
-    else if (prevVelocity.x > 0) player.setTexture("gabe", "gabe-right-walk");
-    else if (prevVelocity.y < 0) player.setTexture("gabe", "gabe-back-walk");
-    else if (prevVelocity.y > 0) player.setTexture("gabe", "gabe-front-walk"); */
+      
+      // If we were moving, pick and idle frame to use
+      /* if (prevVelocity.x < 0) player.setTexture("gabe", "gabe-left-walk");
+      else if (prevVelocity.x > 0) player.setTexture("gabe", "gabe-right-walk");
+      else if (prevVelocity.y < 0) player.setTexture("gabe", "gabe-back-walk");
+      else if (prevVelocity.y > 0) player.setTexture("gabe", "gabe-front-walk"); */
+    }
   }
 }

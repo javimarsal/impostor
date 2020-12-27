@@ -71,6 +71,11 @@ function ClienteWS() {
         var datos = {nick:this.nick, codigo:this.codigo, numJugador:this.numJugador, direccion:direccion, x:x, y:y};
         this.socket.emit("movimiento", datos);
     }
+
+    this.realizarTarea = function() {
+        var datos = {nick:this.nick, codigo:this.codigo};
+        this.socket.emit("realizarTarea", datos);
+    }
 	
 
     // servidor WS dentro del cliente
@@ -143,37 +148,40 @@ function ClienteWS() {
             // llamar a: cw.mostrarListaJugadores(lista);
         });
 
-        this.socket.on('hasAtacado', function(data) {
-            console.log(data);
-        });
-
         this.socket.on('muereInocente', function(inocente) {
             console.log('muere ' + inocente);
             if(cli.inocente == inocente) {
                 cli.estado = "muerto";
+                $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
             }
             dibujarMuereInocente(inocente);
         })
 
-        this.socket.on('votacionLanzada', function(data) {
-            console.log(data);
-            //dibujarVotacion(lista)
+        this.socket.on('votacionLanzada', function(lista) { //lista de los que pueden votar
+            console.log(lista);
+            cw.mostrarModalVotacion(lista);
         });
 
         this.socket.on('finalVotacion', function(data) {
             console.log(data);
+            //cerrar el modal
+            $('modalGeneral').modal('toggle');
+            // modal del resultado
+            cw.mostrarModalSimple(data.elegido);
         });
 
         this.socket.on('haVotado', function(data) {
             console.log(data);
+            //actualizar la lista
         });
 
         this.socket.on('recibirEncargo', function(data) {
             console.log(data);
+            cli.impostor = data.impostor;
+            cli.encargo = data.encargo;
             if(data.impostor) {
-                $('#avisarImpostor').modal("show");
-                cli.impostor = data.impostor;
-                cli.encargo = data.encargo;
+                //$('#avisarImpostor').modal("show");
+                cw.mostrarModalSimple('eres el impostor');
             }
         });
 
@@ -182,14 +190,30 @@ function ClienteWS() {
             for(var i=0; i<lista.length; i++) {
                 if(lista[i].nickJugador!=cli.nick) {
                     lanzarJugadorRemoto(lista[i].nickJugador, lista[i].numJugador);
-                    crearColision();
                 }
             }
-            
+            crearColision();
         });
 
         this.socket.on('moverRemoto', function(datos) {
             mover(datos);
+        });
+
+        this.socket.on('tareaRealizada', function(data) {
+            console.log(data);
+            //tareasOn = true;
+        });
+
+        this.socket.on('final', function(data) {
+            console.log(data);
+            finPartida(data);
+        });
+
+        this.socket.on('hasAtacado', function(fase) {
+            if(fase == "jugando") {
+                console.log(fase);
+                ataquesOn = true;
+            }
         });
     }
 
