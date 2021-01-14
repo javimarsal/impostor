@@ -349,14 +349,14 @@ describe("El juego del impostor", function() {
 
             it("Realizar tareas", function() {
                 var partida = juego.partidas[codigo]; // la partida debe estar iniciada
-                expect(partida.obtenerPercentGlobal()).toEqual(25);
+                expect(partida.obtenerPercentGlobal()).toEqual(0);
 
                 for(var i=0; i<9; i++) { // 10 es el máximo de las tareas
                     for(nick in partida.usuarios) {
                         partida.usuarios[nick].realizarTarea();
                     }
                     expect(partida.fase.esJugando()).toBe(true);
-                    expect(partida.obtenerPercentGlobal()).toEqual((25 + (i+1)*75)/10);
+                    expect(partida.obtenerPercentGlobal()).toEqual(((i+1)*100)/10);
                 }
 
                 for(nick in partida.usuarios) {

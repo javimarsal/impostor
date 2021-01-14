@@ -77,7 +77,7 @@ function ServidorWS() {
                 cli.enviarATodos(io, codigo, 'muereInocente', victima);
                 cli.enviarRemitente(socket, 'hasAtacado', fase);
                 if(fase == "final") {
-                    cli.enviarATodos(io, codigo, 'final', "Ganan los impostores");
+                    cli.enviarATodos(io, codigo, 'final', "Ganan los impostores.");
                 }
                 
             });
@@ -96,8 +96,16 @@ function ServidorWS() {
                 juego.votarSkip(nick, codigo);
 
                 if(partida.hanVotadoTodos()) {
-                    var elegido = partida.finalizarVotacion();
-                    var data = {"elegido": elegido, "fase": partida.fase.nombre};
+                    // mensajeVotacion, elegido (obj Usuario), finalPartida (booleano), mensajeEstadoPartida
+                    var resultado = partida.finalizarVotacion();
+                    
+                    var elegido = resultado.elegido; // elegido es un obj Usuario
+                    var mensajeVotacion = resultado.mensajeVotacion;
+                    var mensajeEstadoPartida = resultado.mensajeEstadoPartida;
+                    var finalPartida = resultado.finalPartida;
+                    var mensaje = mensajeVotacion + " " + mensajeEstadoPartida;
+                    
+                    var data = {"elegido": elegido, "fase": partida.fase.nombre, "mensaje": mensaje, "finalPartida": finalPartida};
                     // enviar a todos el más votado y la fase
                     cli.enviarATodos(io, codigo, 'finalVotacion', data);
                 }
@@ -112,10 +120,19 @@ function ServidorWS() {
                 juego.votar(nick, codigo, sospechoso);
 
                 if(partida.hanVotadoTodos()) {
-                    var elegido = partida.finalizarVotacion();
-                    var data = {"elegido": elegido, "fase": partida.fase.nombre};
-                    // enviar a todos el más votado y la fase
+                    // mensajeVotacion, elegido (obj Usuario), finalPartida (booleano), mensajeEstadoPartida
+                    var resultado = partida.finalizarVotacion();
+                    
+                    var elegido = resultado.elegido; // elegido es un obj Usuario
+                    var mensajeVotacion = resultado.mensajeVotacion;
+                    var mensajeEstadoPartida = resultado.mensajeEstadoPartida;
+                    var finalPartida = resultado.finalPartida;
+                    var mensaje = mensajeVotacion + " " + mensajeEstadoPartida;
+                    
+                    var data = {"elegido": elegido, "fase": partida.fase.nombre, "mensaje": mensaje, "finalPartida": finalPartida};
+                    
                     cli.enviarATodos(io, codigo, 'finalVotacion', data);
+
                 }
                 else {
                     // enviar la lista de los que han votado
@@ -145,7 +162,7 @@ function ServidorWS() {
                 var nick = datos.nick;
                 var codigo = datos.codigo;
                 var partida = juego.partidas[codigo];
-                juego.realizarTarea(nick, codigo);
+                juego.realizarTarea(datos);
                 var fasePartida = juego.getEstadoPartida(codigo); // el objeto
                 var percent = partida.obtenerPercentTarea(nick);
                 var global = partida.obtenerPercentGlobal();

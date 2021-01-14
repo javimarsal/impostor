@@ -300,8 +300,12 @@ function Partida(num, owner, codigo, minimo) {
         //let victima = this.elegirTripulanteVivo();
         let jugadorAtacado = this.usuarios[victima];
         jugadorAtacado.esAtacado();
+
         // Comprobar si termina la partida
-        if(this.comprobarFinal()) {
+        let resultado = this.comprobarFinal()
+        let finalPartida = resultado.finalPartida;
+        
+        if(finalPartida) {
             console.log("La partida ha terminado.");
         }
 
@@ -385,16 +389,25 @@ function Partida(num, owner, codigo, minimo) {
     }
 
     this.comprobarFinal = function() {
+        let finalPartida = false;
+        let mensaje = "Seguimos jugando.";
+        let resultado = {};
+
         if(this.gananImpostores()) {
             this.fase = new Final();
-            console.log("Los impostores han ganado.");
-            return true;
+            mensaje = "Los impostores han ganado.";
+            finalPartida = true;
         }
         else if(this.gananTripulantes()) {
             this.fase = new Final();
-            console.log("Los tripulantes han ganado.");
-            return true;
+            mensaje = "Los tripulantes han ganado.";
+            finalPartida = true;
         }
+
+        console.log(mensaje);
+
+        resultado = {mensaje:mensaje, finalPartida:finalPartida};
+        return resultado;
     }
 
     this.masVotado = function() {
@@ -446,6 +459,8 @@ function Partida(num, owner, codigo, minimo) {
 
     this.comprobarVotacion = function() {
         let elegido = this.masVotado();
+        let mensaje = "";
+        let resultado = {};
 
         // Poner a los que no han votado, el skip y haVotado a true
         for(key in this.usuarios) {
@@ -455,16 +470,20 @@ function Partida(num, owner, codigo, minimo) {
             }
         }
 
+        // elegido puede ser undefined
         if(elegido && elegido.votos > this.numeroSkips()) {
             elegido.esAtacado();
             this.elegido = elegido.nick;
-            console.log(elegido.nick, "fue eyectado.");
+            mensaje = elegido.nick + " fue eyectado.";
         }
         else {
-            console.log("Nadie fue eyectado.");
+            mensaje = "Nadie fue eyectado.";
         }
 
-        return this.elegido;
+        console.log(mensaje);
+        
+        resultado = {mensaje: mensaje, elegido: this.elegido};
+        return resultado;
 
     }
 
@@ -497,13 +516,22 @@ function Partida(num, owner, codigo, minimo) {
     }
 
     this.puedeFinalizarVotacion = function() {
-        let elegido = this.comprobarVotacion();
+        let datosVotacion = this.comprobarVotacion(); // tiene mensaje: es una cadena, y elegido:obj Usuario
+        let mensajeVotacion = datosVotacion.mensaje;
+        let elegido = datosVotacion.elegido;
+
+        let estadoPartida = this.comprobarFinal();
+        let finalPartida = estadoPartida.finalPartida;
+        let mensajeEstadoPartida = estadoPartida.mensaje;
+        
+        let resultado = {mensajeVotacion:mensajeVotacion, elegido:elegido, finalPartida:finalPartida, mensajeEstadoPartida:mensajeEstadoPartida};
         this.reiniciarVotos();
-        if(!this.comprobarFinal()) {
+        
+        if(!finalPartida) {
             this.fase = new Jugando();
         }
-
-        return elegido;
+        
+        return resultado;
     }
 
     // TERMINA VOTACIONES //
@@ -581,9 +609,12 @@ function Partida(num, owner, codigo, minimo) {
     this.obtenerPercentGlobal = function() {
         var total = 0;
         for(nick in this.usuarios) {
-            total = total + this.obtenerPercentTarea(nick);
+            if (!this.usuarios[nick].impostor) {
+                total = total + this.obtenerPercentTarea(nick);
+            }  
         }
-        total = total/(this.numJugadores() /*- this.numImpostores()*/);
+        
+        total = total/(this.numTripulantesVivos());
         return total;
     }
 
@@ -958,14 +989,16 @@ function Usuario(nick, juego) {
 
     this.realizarTarea = function() {
         if(!this.impostor) {
-            if(this.contadorTarea < this.maximoContadorTarea) {
-                this.contadorTarea++;
+            this.contadorTarea++;
 
-                if(this.contadorTarea >= this.maximoContadorTarea) {
-                    this.estadoTarea = "completada";
-                    this.partida.tareaTerminada();
-                }
+            //if(this.contadorTarea < this.maximoContadorTarea) {
+                
+
+            if(this.contadorTarea >= this.maximoContadorTarea) {
+                this.estadoTarea = "completada";
+                this.partida.tareaTerminada();
             }
+            //}
         }
         console.log(this.nick + " realizar tarea " + this.encargo + " estado tarea " + this.estadoTarea);
     }

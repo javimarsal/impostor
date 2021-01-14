@@ -477,7 +477,7 @@ function mover(datos) {
 function finPartida(data) {
   final = true;
   //remoto = undefined;
-  cw.mostrarModalSimple("Fin de la partida. " + data);
+  cw.mostrarModalSimple(data + " Fin de la partida.");
 }
 
 

@@ -164,10 +164,18 @@ function ClienteWS() {
 
         this.socket.on('finalVotacion', function(data) {
             console.log(data);
+            
             //cerrar el modal
             $('modalGeneral').modal('toggle');
+            
             // modal del resultado
-            cw.mostrarModalSimple(data.elegido);
+            if(data.finalPartida) {
+                finPartida(data.mensaje);
+            }
+            else {
+                cw.mostrarModalSimple(data.mensaje);
+            }
+            
         });
 
         this.socket.on('haVotado', function(data) {
@@ -201,7 +209,7 @@ function ClienteWS() {
 
         this.socket.on('tareaRealizada', function(data) {
             console.log(data);
-            //tareasOn = true;
+            tareasOn = true;
         });
 
         this.socket.on('final', function(data) {
