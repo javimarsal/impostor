@@ -380,12 +380,10 @@ function dibujarMuereInocente(inocente) {
   var x = jugadores[inocente].x;
   var y = jugadores[inocente].y;
   var numJugador = jugadores[inocente].numJugador;
-
   //dibujar el sprite tumbado o...
   var muerto = crear.physics.add.sprite(x, y, "muertos", recursos[numJugador].frame);
   //meter el sprite en el grupo muertos
   muertos.add(muerto); //se agrega el sprite muerto
-  
   //crear la función que gestiona la colisión entre vivos y muertos
   crear.physics.add.overlap(player, muertos, votacion);
 }
@@ -477,9 +475,17 @@ function mover(datos) {
 function finPartida(data) {
   final = true;
   //remoto = undefined;
-  cw.mostrarModalSimple(data + " Fin de la partida.");
+  cw.mostrarModalFinal(data + " Fin de la partida.");
 }
 
+function jugadorAbandona(nick) {
+  cw.mostrarModalSimple("Jugador " + nick + " abandona.");
+  if(jugadores[nick]) {
+    jugadores[nick].destroy();
+    delete jugadores[nick];
+  }
+  
+}
 
 
 function update(time, delta) {

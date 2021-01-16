@@ -31,6 +31,10 @@ function ControlWeb($) {
         
     }
 
+    this.inicio = function() {
+        location.reload();
+    }
+
     this.limpiar = function() {
         $('#mER').remove();
         //$('mostrarCP').remove(); //crear partida
@@ -40,6 +44,9 @@ function ControlWeb($) {
 
     this.mostrarEsperandoRival = function(lista) {
         $('#mER').remove();
+        $('#mUAP').remove();
+        $('#mostrarCrearPartida').remove();
+
         var cadena = '<div id="mER">';
         cadena = cadena + '<h3 style="color:rgb(255, 238, 0)"><b>Esperando jugadores</b></h3>'
         cadena = cadena + '<img src="cliente/img/among_esperando.gif">';
@@ -77,6 +84,22 @@ function ControlWeb($) {
 
     }
 
+    this.mostrarAbandonarPartida = function() {
+        $('#mAbandonarPartida').remove();
+
+        var cadena = '<div id = "mAbandonarPartida">';
+        cadena = cadena + '<button type="button" class="btn btn-success" id="btnAbandonar">Abandonar Partida</button>';
+        cadena = cadena + '</div>';
+
+        $('#abandonarPartida').append(cadena);
+
+        $('#btnAbandonar').on('click', function() {
+            $('#mER').remove();
+            $('#nuevosJugadores').remove();
+            ws.abandonarPartida();
+        });
+    }
+
     this.mostrarAvisoNuevoJugador = function(nick) {
         cadena = '<li class="list-group-item">' + nick + ' se ha unido</li>';
         $('#nuevosJugadores').append(cadena);
@@ -111,8 +134,6 @@ function ControlWeb($) {
             var codigo = StoreValue[0];
             // controlar
             if(nick != "" && codigo != null) {
-                $('#mUAP').remove();
-                $('#mostrarCrearPartida').remove();
                 ws.unirAPartida(nick, codigo);
             }
             
@@ -163,6 +184,19 @@ function ControlWeb($) {
                 ws.votarSkip();
             }
             
+        });
+    }
+
+    this.mostrarModalFinal = function(mensaje){
+        this.limpiarModal();
+        var cadena='<div id="final"><h3>' + mensaje + '</h3>';
+        $("#contenidoModal").append(cadena);
+        $("#pie").append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>');
+        $('#modalGeneral').modal("show");
+        
+        
+        $('#cerrar').click(function() {
+            cw.inicio();
         });
     }
 

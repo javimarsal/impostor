@@ -36,12 +36,18 @@ function ServidorWS() {
             socket.on('unirAPartida', function(nick, codigo) {
                 // puede llegar un nick o codigo nulo
                 var nickJugador = juego.unirAPartida(codigo, nick);
-                console.log('usuario: ' + nickJugador + ' se ha unido a la partida: ' + codigo)
-                socket.join(codigo); // aislamos al cliente en la partida
-                var owner = juego.obtenerOwner(codigo);
-                var numJugador = juego.partidas[codigo].usuarios[nickJugador].numJugador;
-                cli.enviarRemitente(socket, "unidoAPartida", {"codigo": codigo, "owner": owner, "nickJugador": nickJugador, "numJugador": numJugador});
-                cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", nickJugador);
+                if(nickJugador) {
+                    console.log('usuario: ' + nickJugador + ' se ha unido a la partida: ' + codigo)
+                    socket.join(codigo); // aislamos al cliente en la partida
+                    var owner = juego.obtenerOwner(codigo);
+                    var numJugador = juego.partidas[codigo].usuarios[nickJugador].numJugador;
+                    cli.enviarRemitente(socket, "unidoAPartida", {"codigo": codigo, "owner": owner, "nickJugador": nickJugador, "numJugador": numJugador});
+                    cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", nickJugador);
+                }
+                /* else {
+                    cw.inicio();
+                } */
+                
             });
 
             socket.on('iniciarPartida', function(nick, codigo) {
@@ -71,7 +77,7 @@ function ServidorWS() {
             });
 
             socket.on('atacar', function(nick, codigo, victima) {
-                var victima = juego.atacar(nick, codigo, victima);
+                juego.atacar(nick, codigo, victima);
                 var partida = juego.partidas[codigo];
                 var fase = partida.fase.nombre;
                 cli.enviarATodos(io, codigo, 'muereInocente', victima);
@@ -171,6 +177,30 @@ function ServidorWS() {
                 if(fasePartida.esFinal()) {
                     cli.enviarATodos(io, codigo, "final", "Ganan los tripulates");
                 }
+                
+            });
+
+            socket.on('abandonarPartida', function(nick, codigo) {
+                var partida = juego.partidas[codigo];
+                var resultado = juego.abandonarPartida(nick, codigo);
+                var datos = {mensaje:resultado.mensaje, finalPartida:resultado.finalPartida, nick:nick};
+                var fase = partida.fase.nombre;
+                cli.enviarATodos(io, codigo, "jugadorAbandona", datos);
+                
+                if(fase == "final") {
+                    var jugadorMensaje = "Jugador " + nick + " abandona.";
+                    var mensajeFinal = jugadorMensaje + " " + datos.mensaje;
+                    cli.enviarATodos(io, codigo, "final", mensajeFinal);
+                    juego.eliminarPartida(codigo);
+
+                    var lista = juego.listaPartidasDisponibles();
+                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+                }
+                else {
+                    socket.leave(codigo);
+                    //cli.enviarRemitente(socket, "partidaAbandonada");
+                }
+
                 
             });
 		});

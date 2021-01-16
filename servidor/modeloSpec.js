@@ -136,31 +136,37 @@ describe("El juego del impostor", function() {
         });
 
         it("Todos abandonan la partida", function() {
+            var partida = juego.partidas[codigo];
             juego.unirAPartida(codigo, nick2);
-            var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
-            expect(nUsr).toEqual(2);
+            
+            expect(partida.numJugadores()).toEqual(2);
             expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
             
             juego.unirAPartida(codigo, nick2);
-            var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
-            expect(nUsr).toEqual(3);
+            expect(partida.numJugadores()).toEqual(3);
             expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
 
             juego.unirAPartida(codigo, nick2);
-            var nUsr = Object.keys(juego.partidas[codigo].usuarios).length;
-            expect(nUsr).toEqual(4);
+            expect(partida.numJugadores()).toEqual(4);
             expect(juego.partidas[codigo].fase.esCompletado()).toBe(true);
             
             // Se salen de la partida
-            var partida = juego.partidas[codigo];
-            juego.abandonarPartida(codigo, "Javier");
+            juego.abandonarPartida("Javier", codigo);
             expect(juego.partidas[codigo].fase.esInicial()).toBe(true);
+            expect(partida).not.toBe(undefined);
+            expect(partida.numJugadores()).toEqual(3);
 
-            juego.abandonarPartida(codigo, "Javier1");
-            juego.abandonarPartida(codigo, "Javier2");
-            juego.abandonarPartida(codigo, "Pepe");
-            expect(partida.numJugadores() == 0).toBe(true);
-            expect(juego.partidas[codigo]).toBe(undefined);
+            juego.abandonarPartida("Javier1", codigo);
+            expect(partida).not.toBe(undefined);
+            expect(partida.numJugadores()).toEqual(2);
+
+            juego.abandonarPartida("Javier2", codigo);
+            expect(partida).not.toBe(undefined);
+            expect(partida.numJugadores()).toEqual(1);
+            
+            juego.abandonarPartida("Pepe", codigo);
+            //expect(partida).toBe(undefined);
+            //expect(juego.partidas[codigo]).toBe(undefined);
         });
 
         describe("Pepe inicia la partida de 4 jugadores, y se llena. Votaciones", function() {

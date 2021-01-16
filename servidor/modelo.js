@@ -81,7 +81,7 @@ function Juego(min) {
     }
     
     this.unirAPartida = function(codigo, nick) {
-        let nickJugador = "fallo";
+        let nickJugador = undefined;
         
         if(this.partidas[codigo] && codigo != undefined && nick != undefined) {
             nickJugador = this.partidas[codigo].agregarUsuario(nick);
@@ -90,10 +90,10 @@ function Juego(min) {
         return nickJugador;
     }
 
-    this.abandonarPartida = function(codigo, nick) {
-        if(this.partidas[codigo]) {
-            this.partidas[codigo].abandonarPartida(nick, this);
-            // pasamos this por si hay que eliminar la partida
+    this.abandonarPartida = function(nick, codigo) {
+        let partida = this.partidas[codigo];
+        if(partida) {
+            return partida.usuarios[nick].abandonarPartida();
         }
     }
 
@@ -114,8 +114,8 @@ function Juego(min) {
         return Object.keys(partidas).find(codigo => partidas[codigo] === p);
     }
 
-    this.eliminarPartida = function(partida) {
-        let codigo = this.obtenerCodigoDePartida(this.partidas, partida);
+    this.eliminarPartida = function(codigo) {
+        //let codigo = this.obtenerCodigoDePartida(this.partidas, partida);
         delete this.partidas[codigo];
     }
 
@@ -157,7 +157,7 @@ function Juego(min) {
 
     this.atacar = function(nick, codigo, victima) {
         let usr = this.partidas[codigo].usuarios[nick];
-        return usr.atacar(victima);
+        usr.atacar(victima);
     }
 
     this.realizarTarea = function(datos) {
@@ -187,9 +187,6 @@ function Partida(num, owner, codigo, minimo) {
     this.elegido = "Nadie elegido";
     this.encargos = ["jardin", "tuberias", "electricidad", "oxigeno", "asteroides"];
 
-    this.agregarUsuario = function(nick) {
-        return this.fase.agregarUsuario(nick, this);
-    }
 
     this.obtenerListaJugadoresVivos = function() {
         var lista = [];
@@ -200,6 +197,10 @@ function Partida(num, owner, codigo, minimo) {
             }
         }
         return lista;
+    }
+
+    this.agregarUsuario = function(nick) {
+        return this.fase.agregarUsuario(nick, this);
     }
 
     this.puedeAgregarUsuario = function(nick) {
@@ -215,6 +216,10 @@ function Partida(num, owner, codigo, minimo) {
         this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
         this.usuarios[nuevo].numJugador = this.numJugadores() - 1;
+
+        if(this.comprobarMinimo()) {
+            this.fase = new Completado();
+        }
 
         return nuevo;
     }
@@ -274,33 +279,56 @@ function Partida(num, owner, codigo, minimo) {
         }
     }
 
-    this.abandonarPartida = function(nick, juego) {
-        this.fase.abandonarPartida(nick, this, juego);
+    this.abandonarPartida = function(nick) {
+        return this.fase.abandonarPartida(nick, this);
     }
 
-    this.puedeAbandonarPartida = function(nick, juego) {
-        delete this.usuarios[nick];
+    this.puedeAbandonarPartida = function(nick) {
+        let resultado = {};
+        let finalPartida = false;
+        let mensaje = "Nada que decir.";
+        this.eliminarUsuario(nick);
 
+        // Si estábamos en fase completado
         if(!this.comprobarMinimo()) {
             this.fase = new Inicial();
         }
 
         // comprobar si no quedan usuarios, eliminar partida
         if(this.numJugadores() <= 0) {
-            juego.eliminarPartida(this);
+            this.terminarPartida();
         }
+
+        // Si abandona el propietario se termina la partida (fase final)
+        if(this.nickOwner == nick) {
+            this.terminarPartida();
+        }
+
+        // Si estamos jugando, comprobar si termina la partida
+        if(this.fase.esJugando()) {
+            resultado = this.comprobarFinal();
+            finalPartida = resultado.finalPartida;
+            mensaje = resultado.mensaje;
+        }
+
+        return {mensaje:mensaje, finalPartida:finalPartida, nick:nick};
+    }
+
+    this.eliminarUsuario = function(nick) {
+        // falta completar las tareas del usuario que vamos a eliminar
+        delete this.usuarios[nick];
     }
 
     this.atacar = function(victima) {
-        return this.fase.atacar(this, victima);
+        this.fase.atacar(this, victima);
     }
 
     this.puedeAtacar = function(victima) {
         // Ataca a alguien al azar usando esAtacado() del usuario atacado
         //let victima = this.elegirTripulanteVivo();
+        
         let jugadorAtacado = this.usuarios[victima];
         jugadorAtacado.esAtacado();
-
         // Comprobar si termina la partida
         let resultado = this.comprobarFinal()
         let finalPartida = resultado.finalPartida;
@@ -308,8 +336,6 @@ function Partida(num, owner, codigo, minimo) {
         if(finalPartida) {
             console.log("La partida ha terminado.");
         }
-
-        return victima;
     }
 
     // VOTACIONES //
@@ -613,7 +639,7 @@ function Partida(num, owner, codigo, minimo) {
                 total = total + this.obtenerPercentTarea(nick);
             }  
         }
-        
+
         total = total/(this.numTripulantesVivos());
         return total;
     }
@@ -621,7 +647,6 @@ function Partida(num, owner, codigo, minimo) {
     this.getEstadoPartida = function() {
         return this.fase;
     }
-
 
     // Al crear la partida, el owner también se agrega a la lista de usuarios
     this.agregarUsuario(owner);
@@ -655,19 +680,15 @@ function Inicial(){
     this.agregarUsuario = function(nick, partida) {
         var resultado = partida.puedeAgregarUsuario(nick);
         
-        if(partida.comprobarMinimo()) {
+        /* if(partida.comprobarMinimo()) {
             partida.fase = new Completado();
-        }
+        } */
 
         return resultado;
     }
     
     this.iniciarPartida = function(partida) {
         console.log("Faltan jugadores.");
-    }
-
-    this.abandonarPartida = function(nick, partida, juego) {
-        partida.puedeAbandonarPartida(nick, juego);
     }
 
     this.atacar = function(partida, victima) {
@@ -689,6 +710,10 @@ function Inicial(){
 
     this.realizarTarea = function(nick, partida) {
         console.log("Aun no ha empezado la partida.");
+    }
+
+    this.abandonarPartida = function(nick, partida){
+        return partida.puedeAbandonarPartida(nick);
     }
 }
 
@@ -722,6 +747,7 @@ function Completado(){
         }
         else {
             console.log("Se ha alcanzado el número máximo de jugadores en la partida.");
+            return undefined;
         }
     }
     
@@ -732,10 +758,6 @@ function Completado(){
         else {
             console.log("No se puede iniciar partida. Los impostores ganan.");
         }
-    }
-
-    this.abandonarPartida = function(nick, partida, juego) {
-        partida.puedeAbandonarPartida(nick);
     }
 
     this.atacar = function(partida, victima) {
@@ -757,6 +779,10 @@ function Completado(){
 
     this.realizarTarea = function(nick, partida) {
         console.log("Aun no ha empezado la partida.");
+    }
+
+    this.abandonarPartida = function(nick, partida){
+        return partida.puedeAbandonarPartida(nick);
     }
 }
 
@@ -789,13 +815,8 @@ function Jugando(){
 
     this.iniciarPartida = function(partida) {}
 
-    this.abandonarPartida = function(nick, partida, juego) {
-        partida.puedeAbandonarPartida(nick);
-        // comprobar si termina la partida (más impostores o más tripulantes)
-    }
-
     this.atacar = function(partida, victima) {
-        return partida.puedeAtacar(victima);
+        partida.puedeAtacar(victima);
     }
 
     this.iniciarVotacion = function(partida) {
@@ -813,6 +834,10 @@ function Jugando(){
 
     this.realizarTarea = function(nick, partida) {
         partida.puedeRealizarTarea(nick);
+    }
+
+    this.abandonarPartida = function(nick, partida){
+        return partida.puedeAbandonarPartida(nick);
     }
 }
 
@@ -843,8 +868,6 @@ function Votando() {
 
     this.iniciarPartida = function(partida) {}
 
-    this.abandonarPartida = function(nick, partida, juego) {}
-
     this.atacar = function(partida, victima) {}
 
     this.iniciarVotacion = function(partida) {
@@ -862,6 +885,11 @@ function Votando() {
 
     this.realizarTarea = function(nick, partida) {
         console.log("Estamos votando, no se pueden realizar tareas.");
+    }
+
+    this.abandonarPartida = function(nick, partida){
+        console.log("Espera, se esta votando");
+        return {mensaje:"no puedes abandonar partida", finalPartida:false};
     }
 }
 
@@ -895,10 +923,6 @@ function Final(){
 
     this.iniciarPartida = function(partida) {}
 
-    this.abandonarPartida = function(nick, partida, juego) {
-        partida.puedeAbandonarPartida(nick);
-    }
-
     this.atacar = function(partida, victima) {
         console.log("La partida ya ha terminado.");
     }
@@ -918,6 +942,11 @@ function Final(){
 
     this.realizarTarea = function(nick, partida) {
         console.log("La partida ya ha terminado.");
+    }
+
+    this.abandonarPartida = function(nick, partida){
+        console.log("La partida ya ha terminado.");
+        return {mensaje:"no puedes abandonar partida", finalPartida:false};
     }
 }
 
@@ -945,12 +974,12 @@ function Usuario(nick, juego) {
     }
 
     this.abandonarPartida = function() {
-        this.partida.abandonarPartida(this.nick);
+        return this.partida.abandonarPartida(this.nick);
     }
 
     this.atacar = function(victima) {
         if(this.estado.esVivo() && this.impostor) {
-            return this.partida.atacar(victima);
+            this.partida.atacar(victima);
         }
         else {
             console.log("No eres impostor, no puedes atacar.");

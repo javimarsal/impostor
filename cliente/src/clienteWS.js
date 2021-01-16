@@ -56,9 +56,6 @@ function ClienteWS() {
         this.socket.emit("votarSkip", this.nick, this.codigo);
     }
 
-    this.abandonarPartida = function() {
-    }
-
     this.obtenerEncargo = function() {
         this.socket.emit("obtenerEncargo", this.nick, this.codigo);
     }
@@ -75,6 +72,10 @@ function ClienteWS() {
     this.realizarTarea = function() {
         var datos = {nick:this.nick, codigo:this.codigo};
         this.socket.emit("realizarTarea", datos);
+    }
+
+    this.abandonarPartida = function() {
+        this.socket.emit("abandonarPartida", this.nick, this.codigo);
     }
 	
 
@@ -96,6 +97,7 @@ function ClienteWS() {
                 cli.numJugador = 0;
                 cli.estado = "vivo";
                 cw.mostrarEsperandoRival();
+                cw.mostrarAbandonarPartida();
             }
 
             //pruebasWS(codigo);
@@ -110,6 +112,7 @@ function ClienteWS() {
             
             if(data.nickJugador != "fallo" && data.codigo != null) {
                 cw.mostrarEsperandoRival();
+                cw.mostrarAbandonarPartida();
             }
             
         });
@@ -212,15 +215,34 @@ function ClienteWS() {
             tareasOn = true;
         });
 
-        this.socket.on('final', function(data) {
-            console.log(data);
-            finPartida(data);
+        this.socket.on('final', function(mensaje) {
+            console.log(mensaje);
+            finPartida(mensaje);
         });
 
         this.socket.on('hasAtacado', function(fase) {
             if(fase == "jugando") {
                 console.log(fase);
                 ataquesOn = true;
+            }
+        });
+
+        /* this.socket.on('jugadorAbandona', function(datos) {
+            console.log(datos);
+            if(datos.finalPartida) {
+                finPartida(data.mensaje); // igual el que abandona no debería ver el modal
+                //jugadorAbandona(nick); // necesita nick, en datos no viene nick
+            }
+            else {
+                cw.inicio();
+            }
+        }); */
+
+        this.socket.on("jugadorAbandona",function(datos){
+            if(cli.nick == datos.nick){
+                cw.inicio();
+            } else{
+                jugadorAbandona(datos.nick);
             }
         });
     }
