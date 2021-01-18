@@ -29,7 +29,6 @@ const config = {
   }
 };
 
-//const game = new Phaser.Game(config);
 var game;
 let cursors;
 var player;
@@ -41,7 +40,7 @@ var capaTareas;
 let map;
 var crear;
 var spawnPoint;
-var recursos = [{frame:0, sprite: "naruto"}, {frame:3, sprite:"bulma"}, {frame:6, sprite:"cormac"}, {frame:9, sprite:"gandalf"}]; // datos del personaje si tenemos un sprite con muchos personajes
+var recursos = [{frame:0, frameMuerto:0, sprite: "naruto"}, {frame:3, frameMuerto:3, sprite:"bulma"}, {frame:6, frameMuerto:6, sprite:"cormac"}, {frame:9, frameMuerto:9, sprite:"gandalf"}, {frame:48, frameMuerto:12, sprite:"abuelita"}, {frame:51, frameMuerto:15, sprite:"campanilla"}, {frame:54, frameMuerto:18, sprite:"piruja"}, {frame:57, frameMuerto:21, sprite:"baluba"}, {frame:96, frameMuerto:24, sprite:"sensei"}, {frame:99, frameMuerto:27, sprite:"colonia"}]; // datos del personaje si tenemos un sprite con muchos personajes
 var remotos;
 var muertos;
 var teclaA;
@@ -94,259 +93,357 @@ function create() {
   // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
   spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
 
-  // Create a sprite with physics enabled via the physics system. The image used for the sprite has
-  // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
-  // player con atlas
-  //player = this.physics.add
-    //.sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
-    //.setSize(30, 40)
-    //.setOffset(0, 24);
-  // Comentado //player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, "gabe", recursos[0].frame); // si tenemos un sprite con muchos jugadores
-
-  // Watch the player and worldLayer for collisions, for the duration of the scene:
-  // Comentado //this.physics.add.collider(player, worldLayer);
-
-  // Create the player's walking animations from the texture atlas. These are stored in the global
-  // animation manager so any sprite can access them.
-  /* const anims = this.anims;
-  anims.create({
-    key: "misa-left-walk",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-left-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-  anims.create({
-    key: "misa-right-walk",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-right-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-  anims.create({
-    key: "misa-front-walk",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-front-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-  anims.create({
-    key: "misa-back-walk",
-    frames: anims.generateFrameNames("atlas", {
-      prefix: "misa-back-walk.",
-      start: 0,
-      end: 3,
-      zeroPad: 3
-    }),
-    frameRate: 10,
-    repeat: -1
-  }); */
+  
   let nombre = recursos[0].sprite;
   const anims1 = crear.anims;
     anims1.create({
-      //key: nombre+"left-walk",
       key: nombre+"-left-walk",
       frames: anims1.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 12,
         end: 14,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims1.create({
       key: nombre+"-right-walk",
       frames: anims1.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 24,
         end: 26,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims1.create({
       key: nombre+"-front-walk",
       frames: anims1.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 0,
         end: 2,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims1.create({
       key: nombre+"-back-walk",
       frames: anims1.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 36,
         end: 38,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
 
   nombre = recursos[1].sprite;
   const anims2 = crear.anims;
     anims2.create({
-      //key: nombre+"left-walk",
       key: nombre+"-left-walk",
       frames: anims2.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 15,
         end: 17,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims2.create({
       key: nombre+"-right-walk",
       frames: anims2.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 27,
         end: 29,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims2.create({
       key: nombre+"-front-walk",
       frames: anims2.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 3,
         end: 5,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims2.create({
       key: nombre+"-back-walk",
       frames: anims2.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 39,
         end: 41,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
 
   nombre = recursos[2].sprite;
   const anims3 = crear.anims;
     anims3.create({
-      //key: nombre+"left-walk",
       key: nombre+"-left-walk",
       frames: anims3.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 18,
         end: 20,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims3.create({
       key: nombre+"-right-walk",
       frames: anims3.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 30,
         end: 32,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims3.create({
       key: nombre+"-front-walk",
       frames: anims3.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 6,
         end: 8,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims3.create({
       key: nombre+"-back-walk",
       frames: anims3.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 42,
         end: 44,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
+  
   nombre = recursos[3].sprite;
   const anims4 = crear.anims;
     anims4.create({
-      //key: nombre+"left-walk",
       key: nombre+"-left-walk",
       frames: anims4.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 21,
         end: 23,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims4.create({
       key: nombre+"-right-walk",
       frames: anims4.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 33,
         end: 35,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims4.create({
       key: nombre+"-front-walk",
       frames: anims4.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 9,
         end: 11,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
     anims4.create({
       key: nombre+"-back-walk",
       frames: anims4.generateFrameNames("gabe", {
-        //prefix: "misa-left-walk.",
         start: 45,
         end: 47,
-        //zeroPad: 3
       }),
-      //frameRate: 10,
       repeat: -1
     });
 
-  //const camera = this.cameras.main;
-  //camera.startFollow(player);
-  //camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+  nombre = recursos[4].sprite;
+  const anims5 = crear.anims;
+    anims5.create({
+      key: nombre+"-left-walk",
+      frames: anims5.generateFrameNames("gabe", {
+        start: 60,
+        end: 62,
+      }),
+      repeat: -1
+    });
+    anims5.create({
+      key: nombre+"-right-walk",
+      frames: anims5.generateFrameNames("gabe", {
+        start: 72,
+        end: 74,
+      }),
+      repeat: -1
+    });
+    anims5.create({
+      key: nombre+"-front-walk",
+      frames: anims5.generateFrameNames("gabe", {
+        start: 48,
+        end: 50,
+      }),
+      repeat: -1
+    });
+    anims5.create({
+      key: nombre+"-back-walk",
+      frames: anims5.generateFrameNames("gabe", {
+        start: 84,
+        end: 86,
+      }),
+      repeat: -1
+    });
+
+  nombre = recursos[5].sprite;
+  const anims6 = crear.anims;
+    anims6.create({
+      key: nombre+"-left-walk",
+      frames: anims6.generateFrameNames("gabe", {
+        start: 63,
+        end: 65,
+      }),
+      repeat: -1
+    });
+    anims6.create({
+      key: nombre+"-right-walk",
+      frames: anims6.generateFrameNames("gabe", {
+        start: 75,
+        end: 77,
+      }),
+      repeat: -1
+    });
+    anims6.create({
+      key: nombre+"-front-walk",
+      frames: anims6.generateFrameNames("gabe", {
+        start: 51,
+        end: 53,
+      }),
+      repeat: -1
+    });
+    anims6.create({
+      key: nombre+"-back-walk",
+      frames: anims6.generateFrameNames("gabe", {
+        start: 87,
+        end: 89,
+      }),
+      repeat: -1
+    });
+
+  nombre = recursos[6].sprite;
+  const anims7 = crear.anims;
+    anims7.create({
+      key: nombre+"-left-walk",
+      frames: anims7.generateFrameNames("gabe", {
+        start: 66,
+        end: 68,
+      }),
+      repeat: -1
+    });
+    anims7.create({
+      key: nombre+"-right-walk",
+      frames: anims7.generateFrameNames("gabe", {
+        start: 78,
+        end: 80,
+      }),
+      repeat: -1
+    });
+    anims7.create({
+      key: nombre+"-front-walk",
+      frames: anims7.generateFrameNames("gabe", {
+        start: 54,
+        end: 56,
+      }),
+      repeat: -1
+    });
+    anims7.create({
+      key: nombre+"-back-walk",
+      frames: anims7.generateFrameNames("gabe", {
+        start: 90,
+        end: 92,
+      }),
+      repeat: -1
+    });
+
+  nombre = recursos[7].sprite;
+  const anims8 = crear.anims;
+    anims8.create({
+      key: nombre+"-left-walk",
+      frames: anims8.generateFrameNames("gabe", {
+        start: 69,
+        end: 71,
+      }),
+      repeat: -1
+    });
+    anims8.create({
+      key: nombre+"-right-walk",
+      frames: anims8.generateFrameNames("gabe", {
+        start: 81,
+        end: 83,
+      }),
+      repeat: -1
+    });
+    anims8.create({
+      key: nombre+"-front-walk",
+      frames: anims8.generateFrameNames("gabe", {
+        start: 57,
+        end: 59,
+      }),
+      repeat: -1
+    });
+    anims8.create({
+      key: nombre+"-back-walk",
+      frames: anims8.generateFrameNames("gabe", {
+        start: 93,
+        end: 95,
+      }),
+      repeat: -1
+    });
+
+  nombre = recursos[8].sprite;
+  const anims9 = crear.anims;
+    anims9.create({
+      key: nombre+"-left-walk",
+      frames: anims9.generateFrameNames("gabe", {
+        start: 108,
+        end: 110,
+      }),
+      repeat: -1
+    });
+    anims9.create({
+      key: nombre+"-right-walk",
+      frames: anims9.generateFrameNames("gabe", {
+        start: 120,
+        end: 122,
+      }),
+      repeat: -1
+    });
+    anims9.create({
+      key: nombre+"-front-walk",
+      frames: anims9.generateFrameNames("gabe", {
+        start: 96,
+        end: 98,
+      }),
+      repeat: -1
+    });
+    anims9.create({
+      key: nombre+"-back-walk",
+      frames: anims9.generateFrameNames("gabe", {
+        start: 132,
+        end: 134,
+      }),
+      repeat: -1
+    });
+
+  nombre = recursos[9].sprite;
+  const anims10 = crear.anims;
+    anims10.create({
+      key: nombre+"-left-walk",
+      frames: anims10.generateFrameNames("gabe", {
+        start: 111,
+        end: 113,
+      }),
+      repeat: -1
+    });
+    anims10.create({
+      key: nombre+"-right-walk",
+      frames: anims10.generateFrameNames("gabe", {
+        start: 123,
+        end: 125,
+      }),
+      repeat: -1
+    });
+    anims10.create({
+      key: nombre+"-front-walk",
+      frames: anims10.generateFrameNames("gabe", {
+        start: 99,
+        end: 101,
+      }),
+      repeat: -1
+    });
+    anims10.create({
+      key: nombre+"-back-walk",
+      frames: anims10.generateFrameNames("gabe", {
+        start: 135,
+        end: 137,
+      }),
+      repeat: -1
+    });
+
 
   cursors = crear.input.keyboard.createCursorKeys(); // usa el teclado
   remotos = crear.add.group(); // grupo que tiene todos los usuarios remotos
@@ -373,6 +470,7 @@ function kill(sprite, inocente) { //sprite es el impostor, inocente(igual se lla
   if(teclaA.isDown) {
     ataquesOn = false;
     ws.atacar(nick);
+    //jugadores[nick].visible = false;
   }
 }
 
@@ -381,11 +479,16 @@ function dibujarMuereInocente(inocente) {
   var y = jugadores[inocente].y;
   var numJugador = jugadores[inocente].numJugador;
   //dibujar el sprite tumbado o...
-  var muerto = crear.physics.add.sprite(x, y, "muertos", recursos[numJugador].frame);
+  var muerto = crear.physics.add.sprite(x, y, "muertos", recursos[numJugador].frameMuerto);
   //meter el sprite en el grupo muertos
   muertos.add(muerto); //se agrega el sprite muerto
   //crear la función que gestiona la colisión entre vivos y muertos
   crear.physics.add.overlap(player, muertos, votacion);
+  jugadores[inocente].visible = false;
+}
+
+function visibleTrue(inocente) {
+  jugadores[inocente].visible = true;
 }
 
 
@@ -429,6 +532,7 @@ function lanzarJugador(nick, numJugador) {
   camera = crear.cameras.main;
   camera.startFollow(player);
   camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+  camera.setZoom(2.5);
 
 }
 
@@ -448,10 +552,17 @@ function mover(datos) {
   var numJugador = datos.numJugador;
   var x = datos.x;
   var y = datos.y;
-  var remoto = jugadores[nick];
-  const speed = 175;
+  
+  if(jugadores[nick]) {
+    jugadores[nick].visible = true;
+  }
+  
+  var remoto  = jugadores[nick];
+  
+  const speed = 85;
   const nombre = recursos[numJugador].sprite;
-  if(remoto && !final) {
+ 
+  if(remoto && !final/* && datos.estado == "vivo"*/) {
     const prevVelocity = remoto.body.velocity.clone();
     remoto.body.setVelocity(0);
     remoto.setX(x);

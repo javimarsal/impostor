@@ -3,7 +3,7 @@ function ControlWeb($) {
         var cadena = '<div id="mostrarCrearPartida">';
         cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
         cadena = cadena +    '<label for="nick"><b>Nick:</b></label>';
-        cadena = cadena +    '<input type="text" class="form-control" id="nick">';
+        cadena = cadena +    '<input type="text" value="Jugador" class="form-control" id="nick">';
         cadena = cadena + '</div>';
         cadena = cadena + '<div class="form-group" style="color:rgb(255, 238, 0)">';
         cadena = cadena +    '<label for="num"><b>Número:</b></label>';
@@ -20,8 +20,8 @@ function ControlWeb($) {
             // controlar
             if(nick != "" && num != "") {
                 // limpiar();
-                $('#mUAP').remove();
-                $('#mostrarCrearPartida').remove();
+                //$('#mUAP').remove();
+                //$('#mostrarCrearPartida').remove();
                 ws.crearPartida(nick, num);
                 // mostrarEsperandoRival en clienteWS
             }
@@ -37,7 +37,6 @@ function ControlWeb($) {
 
     this.limpiar = function() {
         $('#mER').remove();
-        //$('mostrarCP').remove(); //crear partida
         $('#mUAP').remove();
         $('#nuevosJugadores').remove();
     }
@@ -144,7 +143,7 @@ function ControlWeb($) {
         this.limpiarModal();
         var cadena = "<p id='avisarImpostor'>" + msg + "</p>";
         $('#contenidoModal').append(cadena);
-        $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
+        $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>');
         $('#modalGeneral').modal("show");
     }
 
@@ -153,7 +152,7 @@ function ControlWeb($) {
         //gif de la tarea, como lo hace el juego
         var cadena = "<p id='tarea'>" + tarea + "</p>";
         $('#contenidoModal').append(cadena);
-        $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
+        $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>');
         $('#modalGeneral').modal("show");
     }
 

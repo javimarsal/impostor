@@ -165,8 +165,11 @@ describe("El juego del impostor", function() {
             expect(partida.numJugadores()).toEqual(1);
             
             juego.abandonarPartida("Pepe", codigo);
-            //expect(partida).toBe(undefined);
-            //expect(juego.partidas[codigo]).toBe(undefined);
+            expect(partida).not.toBe(undefined);
+            expect(partida.numJugadores()).toEqual(0);
+            
+            juego.eliminarPartida(codigo);
+            expect(juego.partidas[codigo]).toBe(undefined);
         });
 
         describe("Pepe inicia la partida de 4 jugadores, y se llena. Votaciones", function() {

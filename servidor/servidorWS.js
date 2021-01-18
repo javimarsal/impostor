@@ -35,18 +35,13 @@ function ServidorWS() {
             
             socket.on('unirAPartida', function(nick, codigo) {
                 // puede llegar un nick o codigo nulo
-                var nickJugador = juego.unirAPartida(codigo, nick);
-                if(nickJugador) {
-                    console.log('usuario: ' + nickJugador + ' se ha unido a la partida: ' + codigo)
+                var datos = juego.unirAPartida(codigo, nick);
+                if(datos) {
+                    console.log('usuario: ' + datos.nick + ' se ha unido a la partida: ' + datos.codigo)
                     socket.join(codigo); // aislamos al cliente en la partida
-                    var owner = juego.obtenerOwner(codigo);
-                    var numJugador = juego.partidas[codigo].usuarios[nickJugador].numJugador;
-                    cli.enviarRemitente(socket, "unidoAPartida", {"codigo": codigo, "owner": owner, "nickJugador": nickJugador, "numJugador": numJugador});
-                    cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", nickJugador);
+                    cli.enviarRemitente(socket, "unidoAPartida", datos);
+                    cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", datos);
                 }
-                /* else {
-                    cw.inicio();
-                } */
                 
             });
 
@@ -165,17 +160,26 @@ function ServidorWS() {
             });
 
             socket.on('realizarTarea', function(datos) {
+                juego.realizarTarea(datos);
+
                 var nick = datos.nick;
                 var codigo = datos.codigo;
                 var partida = juego.partidas[codigo];
-                juego.realizarTarea(datos);
-                var fasePartida = juego.getEstadoPartida(codigo); // el objeto
                 var percent = partida.obtenerPercentTarea(nick);
                 var global = partida.obtenerPercentGlobal();
-                cli.enviarRemitente(socket, "tareaRealizada", {"percent": percent, "global": global});
-                //cli.enviarRemitente(/* fasePartida? */);
+                var fasePartida = juego.getEstadoPartida(codigo); // el objeto
+                var estadoTarea = juego.obtenerEstadoTarea(nick, codigo);
+                
+                cli.enviarRemitente(socket, "tareaRealizada", {"percent": percent, "global": global, "estadoTarea":estadoTarea});
+
+
                 if(fasePartida.esFinal()) {
                     cli.enviarATodos(io, codigo, "final", "Ganan los tripulates");
+                }
+                else {
+                    if(estadoTarea != "completada") {
+                        cli.enviarRemitente(socket, "tareaRealizada", estadoTarea);
+                    }
                 }
                 
             });

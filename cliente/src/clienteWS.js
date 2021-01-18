@@ -65,7 +65,7 @@ function ClienteWS() {
     }
 
     this.movimiento = function(direccion, x, y) {
-        var datos = {nick:this.nick, codigo:this.codigo, numJugador:this.numJugador, direccion:direccion, x:x, y:y};
+        var datos = {nick:this.nick, codigo:this.codigo, numJugador:this.numJugador, estado:this.estado, direccion:direccion, x:x, y:y};
         this.socket.emit("movimiento", datos);
     }
 
@@ -105,21 +105,21 @@ function ClienteWS() {
 
         this.socket.on('unidoAPartida', function(data) {
             cli.codigo = data.codigo;
-            cli.nick = data.nickJugador;
+            cli.nick = data.nick;
             cli.numJugador = data.numJugador;
             cli.estado = "vivo";
             console.log(data);
             
-            if(data.nickJugador != "fallo" && data.codigo != null) {
+            if(data.nick != "fallo" && data.codigo != null) {
                 cw.mostrarEsperandoRival();
                 cw.mostrarAbandonarPartida();
             }
             
         });
 
-        this.socket.on('nuevoJugador', function(nick) {
-            console.log(nick + " se une a la partida");
-            cw.mostrarAvisoNuevoJugador(nick);
+        this.socket.on('nuevoJugador', function(datos) {
+            console.log(datos.nick + " se une a la partida");
+            cw.mostrarAvisoNuevoJugador(datos.nick);
         });
 
         this.socket.on('esperando', function(fase) {
@@ -153,11 +153,14 @@ function ClienteWS() {
 
         this.socket.on('muereInocente', function(inocente) {
             console.log('muere ' + inocente);
-            if(cli.inocente == inocente) {
-                cli.estado = "muerto";
-                $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
+            if(cli.estado != "muerto") {
+                dibujarMuereInocente(inocente);
             }
-            dibujarMuereInocente(inocente);
+            
+            if(cli.nick == inocente) {
+                cli.estado = "muerto";
+                visibleTrue(inocente);
+            }
         })
 
         this.socket.on('votacionLanzada', function(lista) { //lista de los que pueden votar
@@ -207,16 +210,27 @@ function ClienteWS() {
         });
 
         this.socket.on('moverRemoto', function(datos) {
-            mover(datos);
+            if(cli.estado == "vivo" && datos.estado == "muerto") {
+                // los vivos no ven a los muertos
+            }
+            else {
+                mover(datos);
+            }
         });
 
         this.socket.on('tareaRealizada', function(data) {
             console.log(data);
-            tareasOn = true;
+            if(data.estadoTarea == "completada") {
+                tareasOn = false;
+            }
+            else {
+                tareasOn = true;
+            }
         });
 
         this.socket.on('final', function(mensaje) {
             console.log(mensaje);
+            //tareasOn = false;
             finPartida(mensaje);
         });
 

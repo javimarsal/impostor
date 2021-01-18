@@ -174,6 +174,10 @@ function Juego(min) {
         
         return fase;
     }
+
+    this.obtenerEstadoTarea = function(nick, codigo) {
+        return this.partidas[codigo].usuarios[nick].estadoTarea;
+    }
 }
 
 function Partida(num, owner, codigo, minimo) {
@@ -207,21 +211,60 @@ function Partida(num, owner, codigo, minimo) {
         // comprobar nick único
         let cont = 1;
         let nuevo = nick;
-        
-        while (this.usuarios[nuevo]) {
+
+        while(this.usuarios[nuevo]){
             nuevo = nick + cont;
             cont = cont + 1;
         }
-
+        
         this.usuarios[nuevo] = new Usuario(nuevo);
         this.usuarios[nuevo].partida = this;
-        this.usuarios[nuevo].numJugador = this.numJugadores() - 1;
-
+        this.usuarios[nuevo].numJugador = this.asignarNumJugadores();
+        let numero = this.usuarios[nuevo].numJugador;
+        
         if(this.comprobarMinimo()) {
             this.fase = new Completado();
         }
+        
+        return {codigo:this.codigo, nick:nuevo, numJugador:numero};
+    }
 
-        return nuevo;
+    /* this.asignarNumJugadores = function() {
+        let i = 0;
+        for(key in this.usuarios) {
+            if(this.usuarios[key].numJugador != null) {
+                if(this.usuarios[key].numJugador == i) {
+                    i++;
+                }
+                else {
+                    return i;
+                }
+            }
+            else {
+                return i;
+            }
+        }
+    } */
+
+    this.asignarNumJugadores = function() {
+        let i = 0;
+        let esUsado = false;
+            
+        while(true) {
+            esUsado = false;
+            for(key in this.usuarios) {
+                if(this.usuarios[key].numJugador == i) {
+                    esUsado = true;
+                }
+            }
+            if(esUsado) {
+                i++;
+            }
+            else {
+                return i;
+            }
+        }
+
     }
 
     this.iniciarPartida = function() {
