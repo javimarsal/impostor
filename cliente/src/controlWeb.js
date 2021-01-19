@@ -66,31 +66,14 @@ function ControlWeb($) {
             ws.iniciarPartida(nick, codigo);
             // se limpiar al lanzarJuego()
         });
-
-        // Mostrar lista de jugadores Arreglar.
-        // tomar el codigo que tiene el cliente ws, para acceder a la partida
-        // ws.codigo
-        /* var cadena = cadena + '<div id="mLJ" class="col-md-6">';
-        cadena = cadena + '<ul class="list-group">';
-        if(lista) {
-            for(var i=0; i<lista.length; i++) {
-                cadena = cadena + '<li class="list-group-item">' + lista[i].nickJugador + '</li>';
-            }
-            cadena = cadena + '</ul>';
-            cadena = cadena + '</div>';
-        } */
-        
-
     }
 
     this.mostrarAbandonarPartida = function() {
-        $('#mAbandonarPartida').remove();
+        $('#btnAbandonar').remove();
 
-        var cadena = '<div id = "mAbandonarPartida">';
-        cadena = cadena + '<button type="button" class="btn btn-success" id="btnAbandonar">Abandonar Partida</button>';
-        cadena = cadena + '</div>';
+        var cadena = '<button type="button" class="btn btn-danger" id="btnAbandonar">Abandonar Partida</button>';
 
-        $('#abandonarPartida').append(cadena);
+        $('#botones').append(cadena);
 
         $('#btnAbandonar').on('click', function() {
             $('#mER').remove();
@@ -100,13 +83,11 @@ function ControlWeb($) {
     }
 
     this.mostrarMapaTareas = function() {
-        $('#mMapaTareas').remove();
+        $('#btnTareas').remove();
 
-        var cadena = '<div id = "mMapaTareas">';
-        cadena = cadena + '<button type="button" class="btn btn-success" id="btnTareas">Mapa</button>';
-        cadena = cadena + '</div>';
+        var cadena = '<button type="button" class="btn btn-info" id="btnTareas">Mapa</button>';
 
-        $('#abandonarPartida').append(cadena);
+        $('#botones').append(cadena);
 
         $('#btnTareas').on('click', function() {
             cw.mostrarModalImagen("cliente/img/mapa_tareas.png");
@@ -132,8 +113,7 @@ function ControlWeb($) {
 
         // muestra la lista de partidas creadas
         for(var i=0; i<lista.length; i++) {
-            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].huecos + '/' + lista[i].maximo + '</span> </a>';
-            //cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].numJugadores + '/' + lista[i].maximo + '</span> </a>';
+            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].numJugadores + '/' + lista[i].maximo + '</span> </a>';
         }
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-success" id="btnUnir">Unir a Partida</button>';
@@ -219,7 +199,7 @@ function ControlWeb($) {
 
     this.mostrarModalImagen = function(rutaImagen) {
         this.limpiarModal();
-        var cadena = '<img src="' + rutaImagen + '">';
+        var cadena = '<img id="imagen" class="img-responsive" src="' + rutaImagen + '">';
         $('#contenidoModal').append(cadena);
         $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>');
         $('#modalGeneral').modal("show");
@@ -231,6 +211,7 @@ function ControlWeb($) {
         $('#cerrar').remove();
         $('#votacion').remove();
         $('#votar').remove();
+        $('#imagen').remove();
     }
 
 }

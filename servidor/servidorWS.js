@@ -23,15 +23,18 @@ function ServidorWS() {
         var cli = this;
 		io.on('connection', function(socket){ // socket, el cliente que le llega
 		    socket.on('crearPartida', function(nick, numero) {
-		        console.log('usuario: ' + nick + " crea partida numero: " + numero);
-		        //var usr = new modelo.Usuario(nick);
-                var codigo = juego.crearPartida(numero, nick);
-                var listaJugadores = juego.listaJugadores(codigo); // nickJugador, numJugador
-                socket.join(codigo);
-                cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick, "lista": listaJugadores});
-                // enviar a todos los clientes la lista de partidas
-                var lista = juego.listaPartidasDisponibles();
-                cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+		        var codigo = juego.crearPartida(numero, nick);
+                
+                if(codigo && codigo != "fallo") {
+                    console.log('usuario: ' + nick + " crea partida de " + numero + " jugadores");
+                    var listaJugadores = juego.listaJugadores(codigo); // nickJugador, numJugador
+                    socket.join(codigo);
+                    cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick, "lista": listaJugadores});
+                    // enviar a todos los clientes la lista de partidas
+                    var lista = juego.listaPartidasDisponibles();
+                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+                }
+                
             });
             
             socket.on('unirAPartida', function(nick, codigo) {
