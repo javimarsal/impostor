@@ -26,8 +26,9 @@ function ServidorWS() {
 		        console.log('usuario: ' + nick + " crea partida numero: " + numero);
 		        //var usr = new modelo.Usuario(nick);
                 var codigo = juego.crearPartida(numero, nick);
+                var listaJugadores = juego.listaJugadores(codigo); // nickJugador, numJugador
                 socket.join(codigo);
-                cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick});
+                cli.enviarRemitente(socket, "partidaCreada", {"codigo": codigo, "owner": nick, "lista": listaJugadores});
                 // enviar a todos los clientes la lista de partidas
                 var lista = juego.listaPartidasDisponibles();
                 cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
@@ -35,15 +36,18 @@ function ServidorWS() {
             
             socket.on('unirAPartida', function(nick, codigo) {
                 // puede llegar un nick o codigo nulo
-                var datos = juego.unirAPartida(codigo, nick);
+                var datos = juego.unirAPartida(codigo, nick); // codigo, nick, numJugador, fase
+                var listaJugadores = juego.listaJugadores(codigo); // nickJugador, numJugador
+
                 if(datos) {
-                    console.log('usuario: ' + datos.nick + ' se ha unido a la partida: ' + datos.codigo)
+                    var data = {codigo:datos.codigo, nick:datos.nick, numJugador:datos.numJugador, fase:datos.fase, lista:listaJugadores};
+                    console.log('usuario: ' + datos.nick + ' se ha unido a la partida: ' + data.codigo)
                     
                     socket.join(codigo); // aislamos al cliente en la partida
-                    cli.enviarRemitente(socket, "unidoAPartida", datos);
+                    cli.enviarRemitente(socket, "unidoAPartida", data);
                     var lista = juego.listaPartidasDisponibles();
                     cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
-                    cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", datos);
+                    cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", data);
                 }
                 
             });
@@ -177,7 +181,7 @@ function ServidorWS() {
 
 
                 if(fasePartida.esFinal()) {
-                    cli.enviarATodos(io, codigo, "final", "Ganan los tripulates");
+                    cli.enviarATodos(io, codigo, "final", "Ganan los tripulates.");
                 }
                 else {
                     if(estadoTarea != "completada") {
@@ -191,28 +195,23 @@ function ServidorWS() {
                 var partida = juego.partidas[codigo];
                 var resultado = juego.abandonarPartida(nick, codigo);
                 var fase = partida.fase.nombre;
-                var datos = {mensaje:resultado.mensaje, finalPartida:resultado.finalPartida, nick:nick, fase:fase};
+                var listaJugadores = juego.listaJugadores(codigo); // nickJugador, numJugador
+                var datos = {mensaje:resultado.mensaje, finalPartida:resultado.finalPartida, nick:nick, fase:fase, lista:listaJugadores};
                 cli.enviarATodos(io, codigo, "jugadorAbandona", datos);
                 
                 if(fase == "final") {
                     var jugadorMensaje = "Jugador " + nick + " abandona.";
                     var mensajeFinal = jugadorMensaje + " " + datos.mensaje;
                     cli.enviarATodos(io, codigo, "final", mensajeFinal);
-                    juego.eliminarPartida(codigo);
-
-                    var lista = juego.listaPartidasDisponibles();
-                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+                    juego.eliminarPartida(codigo);  
                 }
                 else {
                     socket.leave(codigo);
                 }
 
-                /* if(fase !=) {
-                    var lista = juego.listaPartidasDisponibles();
-                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
-                } */
+                var lista = juego.listaPartidasDisponibles();
+                cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
 
-                
             });
 		});
     }

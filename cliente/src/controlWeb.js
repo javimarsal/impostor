@@ -113,13 +113,16 @@ function ControlWeb($) {
         });
     }
 
-    this.mostrarAvisoNuevoJugador = function(nick) {
-        cadena = '<li class="list-group-item">' + nick + ' se ha unido</li>';
-        $('#nuevosJugadores').append(cadena);
+    this.mostrarListaJugadores = function(lista) {
+        $('#nuevosJugadores').remove();
+        var cadena = '<ul id="nuevosJugadores" class="list-group">';
+        
+        for(var i=0; i<lista.length; i++) {
+            cadena = cadena + '<li class="list-group-item">' + lista[i].nickJugador + '</li>';
+        }
+        cadena = cadena + '</ul>';
 
-        $("li").on('click', function() {
-            $(this).hide();
-        });
+        $('#avisos').append(cadena);
     }
 
     this.mostrarUnirAPartida = function(lista) {

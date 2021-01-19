@@ -98,6 +98,7 @@ function ClienteWS() {
                 cli.estado = "vivo";
                 cw.mostrarEsperandoRival();
                 cw.mostrarAbandonarPartida();
+                cw.mostrarListaJugadores(data.lista);
             }
 
             //pruebasWS(codigo);
@@ -113,14 +114,14 @@ function ClienteWS() {
             if(data.nick != "fallo" && data.codigo != null) {
                 cw.mostrarEsperandoRival();
                 cw.mostrarAbandonarPartida();
+                cw.mostrarListaJugadores(data.lista);
             }
             
         });
 
         this.socket.on('nuevoJugador', function(datos) {
             console.log(datos.nick + " se une a la partida");
-            cw.mostrarAvisoNuevoJugador(datos.nick);
-            //cw.mostrarListaJugadores();
+            cw.mostrarListaJugadores(datos.lista);
         });
 
         this.socket.on('esperando', function(fase) {
@@ -256,14 +257,18 @@ function ClienteWS() {
             }
         });
 
-        this.socket.on("jugadorAbandona",function(datos){
+        this.socket.on("jugadorAbandona",function(datos) {
             console.log(datos);
             if(cli.nick == datos.nick){
                 cw.inicio();
             } else{
                 jugadorAbandona(datos.nick);
             }
+
+            if(datos.fase != "jugando" && datos.fase != "final")
+            cw.mostrarListaJugadores(datos.lista);
         });
+        
     }
 
     this.ini();
