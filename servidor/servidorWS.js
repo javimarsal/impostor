@@ -38,8 +38,11 @@ function ServidorWS() {
                 var datos = juego.unirAPartida(codigo, nick);
                 if(datos) {
                     console.log('usuario: ' + datos.nick + ' se ha unido a la partida: ' + datos.codigo)
+                    
                     socket.join(codigo); // aislamos al cliente en la partida
                     cli.enviarRemitente(socket, "unidoAPartida", datos);
+                    //var lista = juego.listaPartidasDisponibles();
+                    //cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
                     cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", datos);
                 }
                 
@@ -121,10 +124,10 @@ function ServidorWS() {
                 juego.votar(nick, codigo, sospechoso);
 
                 if(partida.hanVotadoTodos()) {
-                    // mensajeVotacion, elegido (obj Usuario), finalPartida (booleano), mensajeEstadoPartida
+                    // mensajeVotacion, elegido, finalPartida (booleano), mensajeEstadoPartida
                     var resultado = partida.finalizarVotacion();
                     
-                    var elegido = resultado.elegido; // elegido es un obj Usuario
+                    var elegido = resultado.elegido; // elegido es un string
                     var mensajeVotacion = resultado.mensajeVotacion;
                     var mensajeEstadoPartida = resultado.mensajeEstadoPartida;
                     var finalPartida = resultado.finalPartida;

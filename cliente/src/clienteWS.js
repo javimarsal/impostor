@@ -119,7 +119,7 @@ function ClienteWS() {
 
         this.socket.on('nuevoJugador', function(datos) {
             console.log(datos.nick + " se une a la partida");
-            cw.mostrarAvisoNuevoJugador(datos.nick);
+            cw.mostrarListaJugadores();
         });
 
         this.socket.on('esperando', function(fase) {
@@ -130,6 +130,7 @@ function ClienteWS() {
             cli.obtenerEncargo();
             console.log("Partida en fase: " + fase); // no se imprime
             lanzarJuego();
+            cw.mostrarMapaTareas();
         });
 
         this.socket.on('recibirListaPartidasDisponibles', function(lista) {
@@ -174,6 +175,16 @@ function ClienteWS() {
             //cerrar el modal
             $('modalGeneral').modal('toggle');
             
+            //matar al elegido, volverlo invisible para los demás
+            if(data.elegido != "Nadie elegido") {
+                visibleFalse(data.elegido);
+            }
+
+            if(cli.nick == data.elegido) {
+                cli.estado = "muerto";
+                visibleTrue(data.elegido);
+            }
+
             // modal del resultado
             if(data.finalPartida) {
                 finPartida(data.mensaje);
@@ -196,6 +207,9 @@ function ClienteWS() {
             if(data.impostor) {
                 //$('#avisarImpostor').modal("show");
                 cw.mostrarModalSimple('eres el impostor');
+            }
+            else {
+                cw.mostrarModalSimple('Tu tarea: ' + data.encargo);
             }
         });
 

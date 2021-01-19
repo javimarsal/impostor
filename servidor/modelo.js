@@ -44,11 +44,12 @@ function Juego(min) {
 
         for(key in this.partidas) {
             let partida = this.partidas[key];
-            huecos = partida.numHuecos();
+            //huecos = partida.numHuecos();
+            let numJugadores = partida.numJugadores();
             let maximo = partida.maximo;
             
             if(huecos>0) {
-                lista.push({"codigo": key, "huecos": huecos, "maximo": maximo});
+                lista.push({"codigo": key, "numJugadores": numJugadores, "maximo": maximo});
             }
         }
         

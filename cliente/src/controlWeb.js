@@ -99,7 +99,21 @@ function ControlWeb($) {
         });
     }
 
-    this.mostrarAvisoNuevoJugador = function(nick) {
+    this.mostrarMapaTareas = function() {
+        $('#mMapaTareas').remove();
+
+        var cadena = '<div id = "mMapaTareas">';
+        cadena = cadena + '<button type="button" class="btn btn-success" id="btnTareas">Mapa</button>';
+        cadena = cadena + '</div>';
+
+        $('#abandonarPartida').append(cadena);
+
+        $('#btnTareas').on('click', function() {
+            cw.mostrarModalImagen("cliente/img/mapa_tareas.png");
+        });
+    }
+
+    this.mostrarListaJugadores = function(nick) {
         cadena = '<li class="list-group-item">' + nick + ' se ha unido</li>';
         $('#nuevosJugadores').append(cadena);
 
@@ -115,7 +129,7 @@ function ControlWeb($) {
 
         // muestra la lista de partidas creadas
         for(var i=0; i<lista.length; i++) {
-            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].huecos + '/' + lista[i].maximo + '</span> </a>';
+            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].numJugadores + '/' + lista[i].maximo + '</span> </a>';
         }
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-success" id="btnUnir">Unir a Partida</button>';
@@ -186,7 +200,7 @@ function ControlWeb($) {
         });
     }
 
-    this.mostrarModalFinal = function(mensaje){
+    this.mostrarModalFinal = function(mensaje) {
         this.limpiarModal();
         var cadena='<div id="final"><h3>' + mensaje + '</h3>';
         $("#contenidoModal").append(cadena);
@@ -197,6 +211,14 @@ function ControlWeb($) {
         $('#cerrar').click(function() {
             cw.inicio();
         });
+    }
+
+    this.mostrarModalImagen = function(rutaImagen) {
+        this.limpiarModal();
+        var cadena = '<img src="' + rutaImagen + '">';
+        $('#contenidoModal').append(cadena);
+        $('#pie').append('<button type="button" id="cerrar" class="btn btn-secondary" data-dismiss="modal">Close</button>');
+        $('#modalGeneral').modal("show");
     }
 
     this.limpiarModal = function() {

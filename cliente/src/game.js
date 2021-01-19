@@ -491,6 +491,9 @@ function visibleTrue(inocente) {
   jugadores[inocente].visible = true;
 }
 
+function visibleFalse(inocente) {
+  jugadores[inocente].visible = false;
+}
 
 function votacion(sprite, muerto) {
   //comprobar si el jugador local pulsa "v" para empezar la votación
