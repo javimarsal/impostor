@@ -41,8 +41,8 @@ function ServidorWS() {
                     
                     socket.join(codigo); // aislamos al cliente en la partida
                     cli.enviarRemitente(socket, "unidoAPartida", datos);
-                    //var lista = juego.listaPartidasDisponibles();
-                    //cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+                    var lista = juego.listaPartidasDisponibles();
+                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
                     cli.enviarATodosMenosRemitente(socket, codigo, "nuevoJugador", datos);
                 }
                 
@@ -190,8 +190,8 @@ function ServidorWS() {
             socket.on('abandonarPartida', function(nick, codigo) {
                 var partida = juego.partidas[codigo];
                 var resultado = juego.abandonarPartida(nick, codigo);
-                var datos = {mensaje:resultado.mensaje, finalPartida:resultado.finalPartida, nick:nick};
                 var fase = partida.fase.nombre;
+                var datos = {mensaje:resultado.mensaje, finalPartida:resultado.finalPartida, nick:nick, fase:fase};
                 cli.enviarATodos(io, codigo, "jugadorAbandona", datos);
                 
                 if(fase == "final") {
@@ -205,8 +205,12 @@ function ServidorWS() {
                 }
                 else {
                     socket.leave(codigo);
-                    //cli.enviarRemitente(socket, "partidaAbandonada");
                 }
+
+                /* if(fase !=) {
+                    var lista = juego.listaPartidasDisponibles();
+                    cli.enviarGlobal(socket, "recibirListaPartidasDisponibles", lista);
+                } */
 
                 
             });

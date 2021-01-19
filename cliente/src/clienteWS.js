@@ -119,7 +119,8 @@ function ClienteWS() {
 
         this.socket.on('nuevoJugador', function(datos) {
             console.log(datos.nick + " se une a la partida");
-            cw.mostrarListaJugadores();
+            cw.mostrarAvisoNuevoJugador(datos.nick);
+            //cw.mostrarListaJugadores();
         });
 
         this.socket.on('esperando', function(fase) {
@@ -255,18 +256,8 @@ function ClienteWS() {
             }
         });
 
-        /* this.socket.on('jugadorAbandona', function(datos) {
-            console.log(datos);
-            if(datos.finalPartida) {
-                finPartida(data.mensaje); // igual el que abandona no debería ver el modal
-                //jugadorAbandona(nick); // necesita nick, en datos no viene nick
-            }
-            else {
-                cw.inicio();
-            }
-        }); */
-
         this.socket.on("jugadorAbandona",function(datos){
+            console.log(datos);
             if(cli.nick == datos.nick){
                 cw.inicio();
             } else{

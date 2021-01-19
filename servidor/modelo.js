@@ -41,15 +41,17 @@ function Juego(min) {
     this.listaPartidasDisponibles = function() {
         let lista = [];
         let huecos = 0;
+        let numJugadores = 0;
 
         for(key in this.partidas) {
             let partida = this.partidas[key];
-            //huecos = partida.numHuecos();
-            let numJugadores = partida.numJugadores();
+            huecos = partida.numHuecos();
+            //numJugadores = partida.numJugadores();
             let maximo = partida.maximo;
             
-            if(huecos>0) {
-                lista.push({"codigo": key, "numJugadores": numJugadores, "maximo": maximo});
+            if(huecos>0 && !partida.fase.esJugando() && !partida.fase.esFinal()) {
+                //lista.push({"codigo": key, "numJugadores": numJugadores, "maximo": maximo});
+                lista.push({"codigo": key, "huecos": huecos, "maximo": maximo});
             }
         }
         
@@ -227,7 +229,7 @@ function Partida(num, owner, codigo, minimo) {
             this.fase = new Completado();
         }
         
-        return {codigo:this.codigo, nick:nuevo, numJugador:numero};
+        return {codigo:this.codigo, nick:nuevo, numJugador:numero, fase:this.fase};
     }
 
     /* this.asignarNumJugadores = function() {
@@ -334,7 +336,7 @@ function Partida(num, owner, codigo, minimo) {
         this.eliminarUsuario(nick);
 
         // Si estábamos en fase completado
-        if(!this.comprobarMinimo()) {
+        if(!this.comprobarMinimo() && this.fase.esCompletado()) {
             this.fase = new Inicial();
         }
 

@@ -113,7 +113,7 @@ function ControlWeb($) {
         });
     }
 
-    this.mostrarListaJugadores = function(nick) {
+    this.mostrarAvisoNuevoJugador = function(nick) {
         cadena = '<li class="list-group-item">' + nick + ' se ha unido</li>';
         $('#nuevosJugadores').append(cadena);
 
@@ -129,7 +129,8 @@ function ControlWeb($) {
 
         // muestra la lista de partidas creadas
         for(var i=0; i<lista.length; i++) {
-            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].numJugadores + '/' + lista[i].maximo + '</span> </a>';
+            cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].huecos + '/' + lista[i].maximo + '</span> </a>';
+            //cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' <span class="badge badge-primary">' + lista[i].numJugadores + '/' + lista[i].maximo + '</span> </a>';
         }
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-success" id="btnUnir">Unir a Partida</button>';
